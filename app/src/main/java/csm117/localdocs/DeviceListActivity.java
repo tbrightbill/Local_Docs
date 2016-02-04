@@ -46,7 +46,7 @@ import java.util.Set;
  * Activity in the result Intent.
  */
 public class DeviceListActivity extends Activity {
-
+//test comment2
     /**
      * Tag for Log
      */
