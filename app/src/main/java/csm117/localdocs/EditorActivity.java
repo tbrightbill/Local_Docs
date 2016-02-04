@@ -8,9 +8,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.content.Intent;
 
 public class EditorActivity extends AppCompatActivity {
-	//test comment
+	// Start the merge activity.  Will later need to get text of merge.
+	public void startMerge(View view) {
+		Intent intent = new Intent(this, MergeActivity.class);
+		startActivity(intent);
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

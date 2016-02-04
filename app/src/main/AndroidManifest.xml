@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="csm117.localdocs">
-
-	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-	<uses-permission android:name="android.permission.BLUETOOTH"/>
+<manifest package="csm117.localdocs"
+		  xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<application
 		android:allowBackup="true"
@@ -18,8 +15,17 @@
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
-				<category android:name="android.intent.category.LAUNCHER" />
+				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
+		</activity>
+		<activity
+			android:name=".MergeActivity"
+			android:label="@string/title_activity_merge"
+			android:parentActivityName=".EditorActivity"
+			android:theme="@style/AppTheme.NoActionBar">
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="csm117.localdocs.EditorActivity"/>
 		</activity>
 	</application>
 

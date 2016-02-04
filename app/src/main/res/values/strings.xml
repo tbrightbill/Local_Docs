@@ -11,4 +11,8 @@
     <string name="title_other_devices">Other Available Devices</string>
     <string name="button_scan">Scan for devices</string>
 
+    <!-- MergeActivity -->
+    <string name="title_activity_merge">MergeActivity</string>
+    <string name="accept_merge">Accept Changes</string>
+    <string name="start_merge">Testing</string>
 </resources>
