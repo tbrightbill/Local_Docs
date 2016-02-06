@@ -4,10 +4,11 @@ package csm117.localdocs;
  * Created by Jae on 2/4/2016.
  */
 
+/*
 public class TextListActivity extends activity{
-    /*
-    get files in storage
-     */
+
+    //get files in storage
+
     public ArrayList<String> GetFiles(String DirectoryPath){
         ArrayList<String> MyFiles = new ArrayList<String>();
         File f = new File(DirectoryPath);
@@ -42,4 +43,4 @@ public class TextListActivity extends activity{
         });
     }
 }
-
+*/
