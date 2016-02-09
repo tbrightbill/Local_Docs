@@ -4,7 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Local_Docs.iml" filepath="$PROJECT_DIR$/Local_Docs.iml" />
       <module fileurl="file://$PROJECT_DIR$/Local_Docs2.iml" filepath="$PROJECT_DIR$/Local_Docs2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/src/androidTest/androidTest.iml" filepath="$PROJECT_DIR$/app/src/androidTest/androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/src/main/main.iml" filepath="$PROJECT_DIR$/app/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/src/test/test.iml" filepath="$PROJECT_DIR$/app/src/test/test.iml" />
     </modules>
   </component>
 </project>
