@@ -1,151 +1,122 @@
 package csm117.localdocs;
 
-/**
- * Created by Jae on 2/4/2016.
- */
-
-
-
-// looking up things I might need to add
-/*
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
-// Writing file
-// in order to use internal storage to write some data in the file, call the openFileOutput() method
-FileOutputStream fOut = openFileOutput("file name here", MODE_WORLD_READABLE);
+// https://github.com/codepath/android_guides/wiki/Using-an-ArrayAdapter-with-ListView
+// ListView
 
-// the method openFileOutput() returns as instance of FileOutputStream. So you receive it in the object of
-// FileInputStream.
-String str = "data";
-fOut.write(str.getBytes());
-fOut.close();
+public class TextListActivity extends Activity {
 
-// Reading file
-//  In order to read from the file you just created, call the openFileInput() method with the name of the file
-FileInputStream fin = openFileInput(file);
+    // Read text from file
+    public void ReadBtn(View v) {
+        //reading text from file
+        try {
+            FileInputStream fileIn=openFileInput("mytextfile.txt");
+            InputStreamReader InputRead= new InputStreamReader(fileIn);
 
-// you can call read method to read one character at a time from the file and then you can print it.
-int c;
-String temp = "";
-while ((c = fin.read()) != -1){
-    temp = temp + Character.toString((char)c);
-}
+            char[] inputBuffer= new char[READ_BLOCK_SIZE];
+            String s="";
+            int charRead;
 
-// string temp contains all the data of the file
-fin.close();
- */
+            while ((charRead=InputRead.read(inputBuffer))>0) {
+                // char to string conversion
+                String readstring=String.copyValueOf(inputBuffer,0,charRead);
+                s +=readstring;
+            }
+            InputRead.close();
+            Toast.makeText(getBaseContext(), s,Toast.LENGTH_SHORT).show();
 
-
-/*
-public class TextListActivity extends activity{
-
-    //get files in storage
-
-    public ArrayList<String> GetFiles(String DirectoryPath){
-        ArrayList<String> MyFiles = new ArrayList<String>();
-        File f = new File(DirectoryPath);
-
-        f.mkdirs();
-        File[] files = f.listFiles();
-        if (files.length == 0)
-            return null;
-        else {
-            for (int i=0; i<files.length; i++)
-                MyFiles.add(files[i].getName());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
-        return MyFiles;
+    private File file;
+    private List<String> myList;
+
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        myList = new ArrayList<String>();
+
+        String root_sd = Environment.getInternalStorageDirectory().toString();
+        file = new File(root_sd);
+        File list[] = file.listFiles();
+
+        for (int i = 0; i < list.length; i++){
+            myList.add(list[i].getName());
+        }
+        setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, myList));
+    }
+
+    protected void onListItemClick(ListView 1, View v, int position, long id){
+        super.onListItemClick(1, v, position, id);
+        File temp_file = new File(file, myList.get(position));
+
+        if (!temp_file.isFile()){
+            file = new File(file, myList.get(position));
+            File list[] = file.listFiles();
+
+            myList.clear;
+
+            for (int i = 0; i < list.length; i++){
+                myList.add(list[i].getName());
+            }
+            Toast.makeText(getApplicationContext(), file.toString(), Toast.LENGTH_LONG).show(setListAdapter(new ArrayAdapter<String>(this,android.R.Layout.simple_list_item_1, myList)));
+        }
     }
 
     @Override
-    public void onCreate() {
-    // Other Code
+    public void onBackPressed() {
+        String parent = file.getParent().toString();
+        file = new File( parent ) ;
+        File list[] = file.listFiles();
 
-        ListView lv;
-        ArrayList<String> FilesInFolder = GetFiles("/sdcard/somefolder");
-        lv = (ListView)findViewById(R.id.filelist);
+        myList.clear();
 
-        lv.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, FilesInFolder));
+        for( int i=0; i< list.length; i++)
+        {
+            myList.add( list[i].getName() );
+        }
+        Toast.makeText(getApplicationContext(), parent,          Toast.LENGTH_LONG).show();
+        setListAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, myList ));
+    }
 
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                // Clicking on items
-            }
-        });
+
+    EditText textmsg;
+    static final int READ_BLOCK_SIZE = 100;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        textmsg=(EditText)findViewById(R.id.editText1);
+    }
+
+    // write text to file
+    public void WriteBtn(View v) {
+        // add-write text into file
+        try {
+            FileOutputStream fileout=openFileOutput("mytextfile.txt", MODE_PRIVATE);
+            OutputStreamWriter outputWriter=new OutputStreamWriter(fileout);
+            outputWriter.write(textmsg.getText().toString());
+            outputWriter.close();
+
+            //display file saved message
+            Toast.makeText(getBaseContext(), "File saved successfully!",
+                    Toast.LENGTH_SHORT).show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
-
-
-Read.setOnClickListener(new View.OnClickListener() {
-
-            //private Context context;
-
-            @Override
-            public void onClick(View v) {
-                //Intent intent = new Intent(getApplicationContext(), MessageBox.class);
-                // TODO Auto-generated method stub
-                //Intent intent = new Intent(context,MessageBox.class);
-                 try{
-                     FileInputStream fin = openFileInput(file);
-                     int c;
-                     String temp="";
-                     while( (c = fin.read()) != -1){
-                        temp = temp + Character.toString((char)c);
-                        Intent in = new Intent(getApplicationContext(),data.class);
-
-                        //String msg = null;
-                        in.putExtra("Msg_Detail", temp);
-                     startActivity(in);
-
-                    // et.setText(temp);
-                     Toast.makeText(getBaseContext(),"file read",
-                     Toast.LENGTH_SHORT).show();
-                     }
-
-
-                  }catch(Exception e){
-
-                  }
-        }
-    });}
-
-     public void save(View view){
-          data = tv.getText().toString();
-          try {
-             FileOutputStream fOut = openFileOutput(file,MODE_WORLD_READABLE);
-             fOut.write(data.getBytes());
-             fOut.close();
-             Toast.makeText(getBaseContext(),"file saved",
-             Toast.LENGTH_SHORT).show();
-          } catch (Exception e) {
-             // TODO Auto-generated catch block
-             e.printStackTrace();
-          }
-       }
-**data.java**
-setContentView(R.layout.data);
-        et11 = (EditText)(findViewById(R.id.eText123));
-        Intent intent = getIntent();
-        String msg = intent.getStringExtra("Msg_Detail");
-        //String msg = intent.getExtras().getString("Msg_Detail");
-        ((EditText)findViewById(R.id.eText123)).setText(msg);
-        //et11.setText(msg);
-
-
-
-
-
-*/
