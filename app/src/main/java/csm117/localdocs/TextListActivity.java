@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
+/*
 // https://github.com/codepath/android_guides/wiki/Using-an-ArrayAdapter-with-ListView
 // ListView
 
@@ -119,4 +119,4 @@ public class TextListActivity extends Activity {
             e.printStackTrace();
         }
     }
-}
+}*/

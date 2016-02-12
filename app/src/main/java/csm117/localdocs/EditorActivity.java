@@ -127,6 +127,7 @@ public class EditorActivity extends AppCompatActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
+		Toast.makeText(EditorActivity.this, "On Resume ", Toast.LENGTH_SHORT).show();
 
 		// Performing this check in onResume() covers the case in which BT was
 		// not enabled during onStart(), so we were paused to enable it...
@@ -237,7 +238,20 @@ public class EditorActivity extends AppCompatActivity {
 	};
 
 	private void setupChat() {
-		//mServices.add(new BluetoothService(this, mHandler));
+		boolean started = false;
+		for (int i = 0; i < mServices.size(); i++) {
+			BluetoothService mChatService = mServices.get(i);
+			if (mChatService != null) {
+				// Only if the state is STATE_NONE, do we know that we haven't started already
+				if (mChatService.getState() == BluetoothService.STATE_NONE) {
+					// Start the Bluetooth chat services
+					mChatService.start();
+					started = true;
+				}
+			}
+		}
+		if (!started)
+			mServices.add(new BluetoothService(this, mHandler));
 	}
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
@@ -290,6 +304,7 @@ public class EditorActivity extends AppCompatActivity {
 			mChatService = mServices.get(mServices.size() - 1);
 		}
 		mChatService.connect(device, secure);
+		setupChat();
 	}
 
 	@Override
