@@ -250,8 +250,10 @@ public class EditorActivity extends AppCompatActivity {
 				}
 			}
 		}
-		if (!started)
+		if (!started) {
 			mServices.add(new BluetoothService(this, mHandler));
+			mServices.get(mServices.size() - 1).start();
+		}
 	}
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
