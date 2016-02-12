@@ -14,7 +14,7 @@ import android.widget.Toast;
 // https://github.com/codepath/android_guides/wiki/Using-an-ArrayAdapter-with-ListView
 // ListView
 
-public class TextListActivity extends Activity {
+/*public class TextListActivity extends Activity {
 
     // Read text from file
     public void ReadBtn(View v) {
@@ -119,4 +119,4 @@ public class TextListActivity extends Activity {
             e.printStackTrace();
         }
     }
-}
+}*/
