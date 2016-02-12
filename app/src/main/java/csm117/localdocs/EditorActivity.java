@@ -18,6 +18,8 @@ import android.app.Activity;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class EditorActivity extends AppCompatActivity {
 
 	private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
@@ -35,7 +37,10 @@ public class EditorActivity extends AppCompatActivity {
 	/**
 	 * Member object for the bluetooth services
 	 */
-	private BluetoothService mChatService = null;
+	//private BluetoothService mChatService = null;
+	private ArrayList<BluetoothService> mServices = new ArrayList<BluetoothService>();
+
+	private ArrayList<String> receivedData = new ArrayList<String>();
 
 	// Start the merge activity.  Will later need to get text of merge.
 	public void startMerge(View view) {
@@ -77,17 +82,20 @@ public class EditorActivity extends AppCompatActivity {
 	}
 
 	private void sendMessage(String message) {
-		// Check that we're actually connected before trying anything
-		if (mChatService.getState() != BluetoothService.STATE_CONNECTED) {
-			Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
-			return;
-		}
+		for (int i = 0; i < mServices.size(); i++) {
+			BluetoothService mChatService = mServices.get(i);
+			// Check that we're actually connected before trying anything
+			if (mChatService.getState() != BluetoothService.STATE_CONNECTED) {
+				Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+				return;
+			}
 
-		// Check that there's actually something to send
-		if (message.length() > 0) {
-			// Get the message bytes and tell the BluetoothChatService to write
-			byte[] send = message.getBytes();
-			mChatService.write(send);
+			// Check that there's actually something to send
+			if (message.length() > 0) {
+				// Get the message bytes and tell the BluetoothChatService to write
+				byte[] send = message.getBytes();
+				mChatService.write(send);
+			}
 		}
 	}
 
@@ -100,7 +108,7 @@ public class EditorActivity extends AppCompatActivity {
 			Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
 			// Otherwise, setup the chat session
-		} else if (mChatService == null) {
+		} else if (mServices.size() == 0) {
 			setupChat();
 		}
 	}
@@ -108,8 +116,11 @@ public class EditorActivity extends AppCompatActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (mChatService != null) {
-			mChatService.stop();
+		for (int i = 0; i < mServices.size(); i++) {
+			BluetoothService mChatService = mServices.get(i);
+			if (mChatService != null) {
+				mChatService.stop();
+			}
 		}
 	}
 
@@ -120,11 +131,14 @@ public class EditorActivity extends AppCompatActivity {
 		// Performing this check in onResume() covers the case in which BT was
 		// not enabled during onStart(), so we were paused to enable it...
 		// onResume() will be called when ACTION_REQUEST_ENABLE activity returns.
-		if (mChatService != null) {
-			// Only if the state is STATE_NONE, do we know that we haven't started already
-			if (mChatService.getState() == BluetoothService.STATE_NONE) {
-				// Start the Bluetooth chat services
-				mChatService.start();
+		for (int i = 0; i < mServices.size(); i++) {
+			BluetoothService mChatService = mServices.get(i);
+			if (mChatService != null) {
+				// Only if the state is STATE_NONE, do we know that we haven't started already
+				if (mChatService.getState() == BluetoothService.STATE_NONE) {
+					// Start the Bluetooth chat services
+					mChatService.start();
+				}
 			}
 		}
 	}
@@ -223,7 +237,7 @@ public class EditorActivity extends AppCompatActivity {
 	};
 
 	private void setupChat() {
-		mChatService = new BluetoothService(this, mHandler);
+		//mServices.add(new BluetoothService(this, mHandler));
 	}
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
@@ -266,6 +280,15 @@ public class EditorActivity extends AppCompatActivity {
 		// Get the BluetoothDevice object
 		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
 		// Attempt to connect to the device
+		BluetoothService mChatService = null;
+		for (int i = 0; i < mServices.size(); i++) {
+			if (mServices.get(i).getState() != BluetoothService.STATE_CONNECTED && mServices.get(i).getState() != BluetoothService.STATE_CONNECTING)
+				mChatService = mServices.get(i);
+		}
+		if (mChatService == null) {
+			mServices.add(new BluetoothService(this, mHandler));
+			mChatService = mServices.get(mServices.size() - 1);
+		}
 		mChatService.connect(device, secure);
 	}
 
