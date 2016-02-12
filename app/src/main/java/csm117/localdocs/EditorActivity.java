@@ -192,6 +192,7 @@ public class EditorActivity extends AppCompatActivity {
 					switch (msg.arg1) {
 						case BluetoothService.STATE_CONNECTED:
 							setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
+							setupChat();
 							break;
 						case BluetoothService.STATE_CONNECTING:
 							setStatus(R.string.title_connecting);
@@ -242,6 +243,8 @@ public class EditorActivity extends AppCompatActivity {
 		for (int i = 0; i < mServices.size(); i++) {
 			BluetoothService mChatService = mServices.get(i);
 			if (mChatService != null) {
+				if (mChatService.getState() == BluetoothService.STATE_LISTEN)
+					return;
 				// Only if the state is STATE_NONE, do we know that we haven't started already
 				if (mChatService.getState() == BluetoothService.STATE_NONE) {
 					// Start the Bluetooth chat services
