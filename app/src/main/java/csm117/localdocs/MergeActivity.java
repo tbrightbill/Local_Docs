@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 import android.text.Html;
+import csm117.diff.Diff;
 
 public class MergeActivity extends AppCompatActivity {
 
@@ -31,10 +32,13 @@ public class MergeActivity extends AppCompatActivity {
 		if (bar != null)
 			bar.setDisplayHomeAsUpEnabled(true);
 
-		String base = "Very long text. This text is very long - much much longer than the other lines.  Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.  Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.  Blah Blah Blah Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.";
-		String mine = "Very long text. This text is very long - much much longer than the other lines.  Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.  Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.  Blah Blah Blah Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.";
+		String mine = "A very long text. This text is very long - much much longer than the other lines.  Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.  Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.  Blah Blah Blah Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.";
 		String theirs = "Very long text. This text is very long - much much longer than the other lines.  Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.  Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.  Blah Blah Blah Very long text. This text is very long - much much longer than the other lines.  This is to test line-wrapping behavior, and to see if the text below is shifted down incorrectly.";
 
+		Diff diff = Diff.createDiff(theirs, mine);
+		String base = "";
+		if (diff != null)
+			base = diff.getColoredHTMLString(theirs);
 		((TextView) findViewById(R.id.myText)).setText(Html.fromHtml(mine));
 		((TextView) findViewById(R.id.theirText)).setText(Html.fromHtml(theirs));
 		((TextView) findViewById(R.id.mergeText)).setText(Html.fromHtml(base));
