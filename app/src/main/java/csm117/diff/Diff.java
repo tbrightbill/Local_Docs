@@ -45,42 +45,35 @@ public final class Diff {
 
 
 	private Diff(ArrayList<String> a, ArrayList<String> b, int[][] v, int depth, int diagonal) {
-		int ending_length;
-		changes = null;
-		if (a.size() > v[depth][diagonal + (depth-1)]) {
-			ending_length = a.size() - v[depth][diagonal + (depth-1)];
-			changes = new Edit[depth + ending_length-1];
-			int j = depth-1;
-			for (int i = v[depth][diagonal + (depth-1)]; i < a.size(); i++) {
-				changes[j] = new Edit(i, false, a.get(i).length(), a.get(i));
-				j++;
-			}
-		} else {
-			ending_length = b.size() - (v[depth][diagonal + (depth-1)] - diagonal);
-			changes = new Edit[depth + ending_length-1];
-			int j = depth-1;
-			for (int i = v[depth][diagonal + (depth-1)] - diagonal; i < b.size(); i++) {
-				changes[j] = new Edit(a.size(), true, b.get(i).length(), b.get(i));
-				j++;
-			}
-		}
-		// The path does not include the final inserts and deletes to make the length equal.
-		// Add these first.
+	    // Based on the algorithm, it is possible that v extends beyond (a.size(), b.size()).
+	    // These extra steps do not correspond to insertions or deletions, so skip these.
+	    // v[depth][i] - a.size()  gives extra x steps.
+	    // (v[depth][i] - diagonal) - b.size()  gives extra y steps.
+	    int extraSteps = 2*v[depth][diagonal + (depth-1)] - diagonal - b.size() - a.size();
+		changes = new Edit[depth - extraSteps - 1];
 		int k = diagonal;
+		if (k+1+depth >= v[depth].length || (k-1+depth >= 0 && v[depth][k-1+depth] >= v[depth][k+1+depth]))
+		    k--;
+		else
+		    k++;
 		for (int i = depth-1; i > 0; i--) {
-			int offset = i-1;
-			//System.out.println("k: " + k +", i: " + i);
-			//System.out.println("delete: " + (k-1+offset) + ", insert: " + (k+1+offset));
-			if (k+1+offset >= v[i].length || (k-1+offset >= 0 && v[i][k-1+offset] >= v[i][k+1+offset])) {
+			//int offset = i;
+			if (k+1+i >= v[i].length || (k-1+i >= 0 && v[i][k-1+i] >= v[i][k+1+i])) {
 				// Handle delete
-				int x = v[i][k-1+offset];
-				changes[i-1] = new Edit(x, false, a.get(x).length(), a.get(x));
+				int x = v[i][k-1+i];
+				if (x < a.size())
+				    changes[i-1 - extraSteps] = new Edit(x, false, a.get(x).length(), a.get(x));
+				else
+				    extraSteps--;
 				k--;
 			} else {
 				// Handle insert
-				int x = v[i][k+1+offset];
-				int y = x - k-1;
-				changes[i-1] = new Edit(x, true, b.get(y).length(), b.get(y));
+				int x = v[i][k+1+i];
+				int y = x - k-2;
+				if (y < b.size())
+				    changes[i-1 - extraSteps] = new Edit(x, true, b.get(y).length(), b.get(y));
+				else
+				    extraSteps--;
 				k++;
 			} // Note: unchanged text implicitly handled - no edit created.
 		}
@@ -120,20 +113,11 @@ public final class Diff {
 					y++;
 				}
 				v2[(offset+1) + k] = x;
-				if (x >= alist.size() || y >= blist.size()) {
-					/*for (int i = 0; i <= d+1; i++) {
-						System.out.print("[");
-						for (int j : allV[i]) {
-							System.out.print(j + " ");
-						}
-						System.out.println("]");
-					}
-					System.out.println("d: " + (d+1) + ", k: " + k);*/
+				if (x >= alist.size() && y >= blist.size()) {
 					return new Diff(alist, blist, allV, d+1, k);
 				}
 			}
 		}
-		System.out.println("Error occurred: should never reach here.");
 		return null;
 	}
 
@@ -152,11 +136,7 @@ public final class Diff {
 	 * Deleted text is in red, added text in green.
 	 */
 	private String getColoredHTMLString(ArrayList<String> original) {
-		String result = "<!DOCTYPE html>\n";
-		result += "<head><style type=text/css>\n";
-		result += "span.insert { color: #00DD00 }\n";
-		result += "span.delete { color: #DD0000; text-decoration: line-through }\n";
-		result += "</style></head><body>\n<p>";
+		String result = "<p>";
 		int k = 0;
 		boolean currentlyFormatting = false;
 		boolean formattingInsert = false;
@@ -181,8 +161,8 @@ public final class Diff {
 			if (change.isInsert) {
 				if (!currentlyFormatting || !formattingInsert) {
 					result += endFormatting;
-					result += "<span class=\"insert\">";
-					endFormatting = "</span>";
+					result += "<font color=\"#00DD00\">";
+					endFormatting = "</font>";
 					formattingInsert = true;
 				}
 				result += change.change;
@@ -190,8 +170,8 @@ public final class Diff {
 			else {
 				if (!currentlyFormatting || formattingInsert) {
 					result += endFormatting;
-					result += "<span class=\"delete\">";
-					endFormatting = "</span>";
+					result += "<font color=\"#DD0000\">";
+					endFormatting = "</font>";
 					formattingInsert = false;
 				}
 				result += original.get(k);
@@ -217,7 +197,7 @@ public final class Diff {
 				result += "</p>\n<p>";
 			}
 		}
-		result += "</p>\n</body>";
+		result += "</p>";
 		return result;
 	}
 
@@ -225,6 +205,10 @@ public final class Diff {
 	public String toString() {
 		String s = "";
 		for (Edit e : changes) {
+		    if (e == null) {
+		        s += "null";
+		        continue;
+		    }
 			s += "{token: " + e.index;
 			if (e.isInsert)
 				s += " insert " + e.change;
