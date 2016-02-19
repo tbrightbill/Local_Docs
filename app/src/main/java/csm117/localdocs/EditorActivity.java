@@ -11,12 +11,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Intent;
 import android.app.Activity;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.Button;
 
 import java.util.ArrayList;
 
@@ -78,6 +80,16 @@ public class EditorActivity extends AppCompatActivity {
 			}
 		});
 
+		Button fileList = (Button)findViewById(R.id.fileList);
+		fileList.setOnClickListener(new OnClickListener()
+		{   public void onClick(View v)
+			{
+				Intent intent = new Intent(EditorActivity.this, TextListActivity.class);
+				startActivity(intent);
+				//finish();
+			}
+		});
+
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 	}
 
@@ -98,6 +110,13 @@ public class EditorActivity extends AppCompatActivity {
 			}
 		}
 	}
+
+//	public void switchActivity(View view)
+//	{
+//		Intent intent = new Intent(EditorActivity.this, TextListActivity.class);
+//		startActivity(intent);
+//	}
+
 
 	@Override
 	public void onStart() {

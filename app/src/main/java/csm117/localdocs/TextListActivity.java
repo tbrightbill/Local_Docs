@@ -4,18 +4,86 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
+import java.io.BufferedReader;
+
 
 import android.app.Activity;
+import android.app.ListFragment;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-/*
+import android.widget.ListView;
+import android.widget.ArrayAdapter;
+
 // https://github.com/codepath/android_guides/wiki/Using-an-ArrayAdapter-with-ListView
 // ListView
 
-/*public class TextListActivity extends Activity {
+public class TextListActivity extends Activity {
 
+    private File file = null;
+    private List<String> myList;
+    ListView listView;
+    ArrayAdapter<String> adapter;
+    private String[] strings = {"Hi", "Hello", "Good morning"};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.file_list);
+
+        // Obtain file names from internal storage
+        myList = new ArrayList<>();
+        file = new File(Environment.getDataDirectory().toString()); // Return the user data directory
+        File[] list = file.listFiles();
+        try {
+            for(int i = 0; i < list.length; i++){
+                myList.add(list[i].getName());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Display the list
+        listView = (ListView) findViewById(R.id.list_view);
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, myList);
+        listView.setAdapter(adapter);
+        // Click on an item in the list
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView textView = (TextView) view;
+                String message = "You clicked # " + position
+                        + ", which is string: " + textView.getText().toString();
+                Toast.makeText(TextListActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+
+//    String yourFilePath = context.getFilesDir() + "/" + "hello.txt";
+//    File yourFile = new File( yourFilePath );
+//
+//    FileInputStream fis = context.openFileInput("hello.txt", Context.MODE_PRIVATE);
+//    InputStreamReader isr = new InputStreamReader(fis);
+//    BufferedReader bufferedReader = new BufferedReader(isr);
+//    StringBuilder sb = new StringBuilder();
+//    String line;
+//    while(bufferedReader.readLine() != null) {
+//        //sb.append(bufferedReader.readLine());
+//        try{
+//            line += bufferedReader.readLine();
+//        }
+//        catch(Exception)
+//
+//    }
+/*
     // Read text from file
     public void ReadBtn(View v) {
         //reading text from file
@@ -29,8 +97,8 @@ import android.widget.Toast;
 
             while ((charRead=InputRead.read(inputBuffer))>0) {
                 // char to string conversion
-                String readstring=String.copyValueOf(inputBuffer,0,charRead);
-                s +=readstring;
+                String readstring = String.copyValueOf(inputBuffer,0,charRead);
+                s += readstring;
             }
             InputRead.close();
             Toast.makeText(getBaseContext(), s,Toast.LENGTH_SHORT).show();
@@ -40,43 +108,51 @@ import android.widget.Toast;
         }
     }
 
-    private File file;
-    private List<String> myList;
-
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        myList = new ArrayList<String>();
+        myList = new ArrayList<>();
 
-        String root_sd = Environment.getInternalStorageDirectory().toString();
-        file = new File(root_sd);
+        //String root_sd = Environment.getInternalStorageDirectory().toString();
+        //directory = new File(Environment.getDataDirectory() + "/RobotiumTestLog/");
+        //file = new File(root_sd);
+        file = new File(Environment.getDataDirectory().toString());
         File list[] = file.listFiles();
 
         for (int i = 0; i < list.length; i++){
             myList.add(list[i].getName());
         }
-        setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, myList));
+        //setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, myList));
+        listView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, myList));
     }
 
-    protected void onListItemClick(ListView 1, View v, int position, long id){
-        super.onListItemClick(1, v, position, id);
+    protected void onListItemClick(ListView l, View v, int position, long id){
+        //super.onListItemClick(l, v, position, id);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+            }
+        });
         File temp_file = new File(file, myList.get(position));
 
         if (!temp_file.isFile()){
             file = new File(file, myList.get(position));
             File list[] = file.listFiles();
 
-            myList.clear;
+            myList.clear();
 
             for (int i = 0; i < list.length; i++){
                 myList.add(list[i].getName());
             }
-            Toast.makeText(getApplicationContext(), file.toString(), Toast.LENGTH_LONG).show(setListAdapter(new ArrayAdapter<String>(this,android.R.Layout.simple_list_item_1, myList)));
+            Toast.makeText(getApplicationContext(), file.toString(), Toast.LENGTH_LONG).show();
+            listView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, myList));
+            //setListAdapter(new ArrayAdapter<String>(this,android.R.Layout.simple_list_item_1, myList)));
         }
     }
 
     @Override
     public void onBackPressed() {
-        String parent = file.getParent().toString();
+        String parent = file.getParent();
         file = new File( parent ) ;
         File list[] = file.listFiles();
 
@@ -86,21 +162,23 @@ import android.widget.Toast;
         {
             myList.add( list[i].getName() );
         }
-        Toast.makeText(getApplicationContext(), parent,          Toast.LENGTH_LONG).show();
-        setListAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, myList ));
+        Toast.makeText(getApplicationContext(), parent, Toast.LENGTH_LONG).show();
+        //setListAdapter(new ArrayAdapter<String>(this,
+          //      android.R.layout.simple_list_item_1, myList ));
+        listView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, myList));
     }
 
 
     EditText textmsg;
     static final int READ_BLOCK_SIZE = 100;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        textmsg=(EditText)findViewById(R.id.editText1);
-    }
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_editor);
+//        //setContentView(R.layout.activity_main);
+//
+//        //textmsg=(EditText)findViewById(R.id.editText1);
+//    }
 
     // write text to file
     public void WriteBtn(View v) {
@@ -118,5 +196,6 @@ import android.widget.Toast;
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-}*/
+    }*/
+}
+
