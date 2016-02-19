@@ -8,11 +8,14 @@ import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.BufferedReader;
-
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.FileWriter;
 
 import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
+import android.util.Log;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -64,8 +67,84 @@ public class TextListActivity extends Activity {
                 Toast.makeText(TextListActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
+        addTextToFile("Hello");
     }
+    // create a file and add text to it
+    public void addTextToFile(String text) {
+        File logFile = new File("usbStorage/" + "MyFile.txt");
+        if (!logFile.exists()) {
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(text);
+            buf.newLine();
+            buf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+/*
+    public void writeToFile() {
+        try {
+            // catches IOException below
+            String TESTSTRING = new String("Hello Android");
 
+       /* We have to use the openFileOutput()-method
+       * the ActivityContext provides, to
+       * protect your file from others and
+       * This is done for security-reasons.
+       * We chose MODE_WORLD_READABLE, because
+       *  we have nothing to hide in our file */
+  /*          FileOutputStream fOut = openFileOutput("samplefile.txt", MODE_PRIVATE);
+            OutputStreamWriter osw = new OutputStreamWriter(fOut);
+
+            // Write the string to the file
+            osw.write(TESTSTRING);
+
+       /* ensure that everything is
+        * really written out and close */
+/*            osw.flush();
+            osw.close();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+*/
+/*    public void readFromFile()
+    {
+        try {
+            String TESTSTRING = new String("Hello Android");
+       /* We have to use the openFileInput()-method
+        * the ActivityContext provides.
+        * Again for security reasons with
+        * openFileInput(...) */
+
+  /*          FileInputStream fIn = openFileInput("samplefile.txt");
+            InputStreamReader isr = new InputStreamReader(fIn);
+
+        /* Prepare a char-Array that will
+         * hold the chars we read back in. */
+    /*        char[] inputBuffer = new char[TESTSTRING.length()];
+
+            // Fill the Buffer with data from the file
+            isr.read(inputBuffer);
+
+            // Transform the chars to a String
+            String readString = new String(inputBuffer);
+
+            // Check if we read back the same chars that we had written out
+            boolean isTheSame = TESTSTRING.equals(readString);
+
+            Log.i("File Reading stuff", "success = " + isTheSame);
+
+        } catch (IOException ioe)
+        {ioe.printStackTrace();}
+    }
 
 //    String yourFilePath = context.getFilesDir() + "/" + "hello.txt";
 //    File yourFile = new File( yourFilePath );
