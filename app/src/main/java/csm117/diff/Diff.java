@@ -1,20 +1,11 @@
 package csm117.diff;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import csm117.diff.Edit;
 
 public final class Diff {
-	class Edit {
-		public int index;
-		public boolean isInsert;
-		public int length;
-		public String change;
-		public Edit(int index, boolean isInsert, int length, String change) {
-			this.index = index;
-			this.isInsert = isInsert;
-			this.length = length;
-			this.change = change;
-		}
-	}
 	private Edit[] changes;
 
 	/**
@@ -44,36 +35,39 @@ public final class Diff {
 	}
 
 
+	private Diff(Edit[] edits) {
+		changes = edits;
+	}
 	private Diff(ArrayList<String> a, ArrayList<String> b, int[][] v, int depth, int diagonal) {
-	    // Based on the algorithm, it is possible that v extends beyond (a.size(), b.size()).
-	    // These extra steps do not correspond to insertions or deletions, so skip these.
-	    // v[depth][i] - a.size()  gives extra x steps.
-	    // (v[depth][i] - diagonal) - b.size()  gives extra y steps.
-	    int extraSteps = 2*v[depth][diagonal + (depth-1)] - diagonal - b.size() - a.size();
+		// Based on the algorithm, it is possible that v extends beyond (a.size(), b.size()).
+		// These extra steps do not correspond to insertions or deletions, so skip these.
+		// v[depth][i] - a.size()  gives extra x steps.
+		// (v[depth][i] - diagonal) - b.size()  gives extra y steps.
+		int extraSteps = 2*v[depth][diagonal + (depth-1)] - diagonal - b.size() - a.size();
 		changes = new Edit[depth - extraSteps - 1];
 		int k = diagonal;
 		if (k+1+depth >= v[depth].length || (k-1+depth >= 0 && v[depth][k-1+depth] >= v[depth][k+1+depth]))
-		    k--;
+			k--;
 		else
-		    k++;
+			k++;
 		for (int i = depth-1; i > 0; i--) {
 			//int offset = i;
 			if (k+1+i >= v[i].length || (k-1+i >= 0 && v[i][k-1+i] >= v[i][k+1+i])) {
 				// Handle delete
 				int x = v[i][k-1+i];
 				if (x < a.size())
-				    changes[i-1 - extraSteps] = new Edit(x, false, a.get(x).length(), a.get(x));
+					changes[i-1 - extraSteps] = new Edit(x, false, a.get(x));
 				else
-				    extraSteps--;
+					extraSteps--;
 				k--;
 			} else {
 				// Handle insert
 				int x = v[i][k+1+i];
 				int y = x - k-2;
 				if (y < b.size())
-				    changes[i-1 - extraSteps] = new Edit(x, true, b.get(y).length(), b.get(y));
+					changes[i-1 - extraSteps] = new Edit(x, true, b.get(y));
 				else
-				    extraSteps--;
+					extraSteps--;
 				k++;
 			} // Note: unchanged text implicitly handled - no edit created.
 		}
@@ -88,7 +82,7 @@ public final class Diff {
 	public static Diff createDiff(String Before, String After) {
 		ArrayList<String> alist = splitString(Before);
 		ArrayList<String> blist = splitString(After);
-		int max = alist.size() + blist.size(); // Maximum value of k
+		int max = alist.size() + blist.size() + 1; // Maximum value of k
 		int offset;
 		// Optimization possible: only half of allV used
 		// By dividing all indices by 2, can shrink space by half.
@@ -122,6 +116,56 @@ public final class Diff {
 	}
 
 	/**
+	 * If this is the diff from string A to string B,
+	 * then given string A, generate string B.
+	 * @param original - original left argument of createDiff
+	 * @return the right argument of createDiff
+	 */
+	public String apply(String original) {
+		ArrayList<String> words = splitString(original);
+		String result = "";
+		int last_included = 0;
+		int cumulative_length = 0;
+		int current_location = 0;
+
+		for (Edit e : changes) {
+			while(current_location < e.index) {
+				cumulative_length += words.get(current_location).length();
+				current_location++;
+			}
+			// Preserve any common changes unaltered by patch
+			if (last_included < cumulative_length)
+				result += original.substring(last_included, cumulative_length);
+			if (e.isInsert)
+				// Insert inserts after the word specified.
+				result += e.change;
+			else
+				cumulative_length += e.change.length();
+			last_included = cumulative_length;
+		}
+		if (last_included < original.length())
+			result += original.substring(last_included);
+		return result;
+	}
+
+	/**
+	 * If this is a diff from string A to B, return a diff from string B to A.
+	 * @return Diff that applies the reverse patch.
+	 */
+	public Diff reverse() {
+		Edit[] edits = new Edit[changes.length];
+		for (int i = 0; i < changes.length; i++) {
+			edits[i] = changes[changes.length - i - 1];
+		}
+		return new Diff(edits);
+	}
+
+	public ArrayList<Edit> getChanges() {
+		return new ArrayList<>(Arrays.asList(changes));
+
+	}
+
+	/**
 	 * Public wrapper for colring string function:
 	 * takes original string, rather than array list.
 	 */
@@ -136,7 +180,7 @@ public final class Diff {
 	 * Deleted text is in red, added text in green.
 	 */
 	private String getColoredHTMLString(ArrayList<String> original) {
-		String result = "<p>";
+		String result = "";
 		int k = 0;
 		boolean currentlyFormatting = false;
 		boolean formattingInsert = false;
@@ -154,9 +198,9 @@ public final class Diff {
 				k++;
 				// newlines are not respected by html, so encode them:
 				// Assumes that \n is a dividing character.
-				if (result.charAt(result.length() - 1) == '\n') {
+				/*if (result.charAt(result.length() - 1) == '\n') {
 					result += "</p>\n<p>";
-				}
+				}*/
 			}
 			if (change.isInsert) {
 				if (!currentlyFormatting || !formattingInsert) {
@@ -180,12 +224,12 @@ public final class Diff {
 			currentlyFormatting = true;
 			// newlines are not respected by html, so encode them:
 			// Assumes that \n is a dividing character.
-			if (result.charAt(result.length() - 1) == '\n') {
+			/*if (result.charAt(result.length() - 1) == '\n') {
 				result += endFormatting;
 				endFormatting = "";
 				currentlyFormatting = false;
 				result += "</p>\n<p>";
-			}
+			}*/
 		}
 		result += endFormatting;
 		while (k < original.size()) {
@@ -201,14 +245,22 @@ public final class Diff {
 		return result;
 	}
 
+	/**
+	 * If this returns 0, then the two texts are identical.
+	 * @return number of changes between texts.
+	 */
+	public int size() {
+		return changes.length;
+	}
+
 	@Override
 	public String toString() {
 		String s = "";
 		for (Edit e : changes) {
-		    if (e == null) {
-		        s += "null";
-		        continue;
-		    }
+			if (e == null) {
+				s += "null";
+				continue;
+			}
 			s += "{token: " + e.index;
 			if (e.isInsert)
 				s += " insert " + e.change;
