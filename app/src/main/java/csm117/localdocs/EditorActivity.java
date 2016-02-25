@@ -1,8 +1,11 @@
 package csm117.localdocs;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Menu;
@@ -20,6 +24,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.Button;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 public class EditorActivity extends AppCompatActivity {
@@ -27,6 +32,7 @@ public class EditorActivity extends AppCompatActivity {
 	private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
 	private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
 	private static final int REQUEST_ENABLE_BT = 3;
+	private static final int REQUEST_FILE = 4;
 
 	/**
 	 * Name of the connected device
@@ -43,6 +49,7 @@ public class EditorActivity extends AppCompatActivity {
 	private ArrayList<BluetoothService> mServices = new ArrayList<BluetoothService>();
 
 	private ArrayList<String> receivedData = new ArrayList<String>();
+
 
 	// Start the merge activity.  Will later need to get text of merge.
 	public void startMerge(View view) {
@@ -85,8 +92,27 @@ public class EditorActivity extends AppCompatActivity {
 		{   public void onClick(View v)
 			{
 				Intent intent = new Intent(EditorActivity.this, TextListActivity.class);
-				startActivity(intent);
+				startActivityForResult(intent, REQUEST_FILE);
 				//finish();
+			}
+		});
+
+		Button btnSave = (Button)findViewById(R.id.btnSave);
+		btnSave.setOnClickListener(new OnClickListener()
+		{   public void onClick(View v)
+			{
+				//create demo file
+				String filename = "testfile";
+				EditText textView = (EditText) EditorActivity.this.findViewById(R.id.editor);
+				String content = textView.getText().toString();
+				FileOutputStream outputStream;
+				try {
+					outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+					outputStream.write(content.getBytes());
+					outputStream.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -302,6 +328,15 @@ public class EditorActivity extends AppCompatActivity {
 							Toast.LENGTH_SHORT).show();
 					finish();
 				}
+			case REQUEST_FILE:
+				// When DeviceListActivity returns with a device to connect
+				if (resultCode == Activity.RESULT_OK) {
+					String content = data.getExtras()
+							.getString(TextListActivity.FILE_CONTENT);
+					EditText textView = (EditText) EditorActivity.this.findViewById(R.id.editor);
+					textView.setText(content, EditText.BufferType.EDITABLE);
+				}
+				break;
 		}
 	}
 

@@ -7,9 +7,7 @@
 	android:fitsSystemWindows="true"
 	tools:context="csm117.localdocs.EditorActivity">
 
-	<EditText android:id="@+id/editor"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent" />
+
 
 	<android.support.design.widget.AppBarLayout
 		android:layout_width="match_parent"
@@ -43,15 +41,6 @@
 		android:layout_margin="@dimen/fab_margin"
 		android:src="@android:drawable/ic_dialog_email" />
 
-	<Button
-		android:id="@+id/fileList"
-		android:text="List of files"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center|end"
-		android:onClick="switchActivity"
-		android:layout_margin="@dimen/fab_margin"
-		android:layout_above="@id/fab"
-		android:src="@android:drawable/ic_dialog_email" />
+
 
 </android.support.design.widget.CoordinatorLayout>
