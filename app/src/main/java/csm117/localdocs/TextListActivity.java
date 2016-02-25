@@ -2,6 +2,7 @@ package csm117.localdocs;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.io.FileWriter;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,6 +33,11 @@ import android.widget.ArrayAdapter;
 
 public class TextListActivity extends Activity {
 
+    /**
+     * Return Intent extra
+     */
+    public static String FILE_CONTENT = "file_content";
+
     private File file = null;
     private List<String> myList;
     ListView listView;
@@ -42,9 +49,26 @@ public class TextListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_list);
 
+        //create demo file
+        String filename = "testfile";
+        File selectedFile = new File(TextListActivity.this.getFilesDir(), filename);
+        if (!selectedFile.exists()) {
+            String content = "Hello world!";
+            FileOutputStream outputStream;
+            try {
+                outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                outputStream.write(content.getBytes());
+                outputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
         // Obtain file names from internal storage
         myList = new ArrayList<>();
-        file = new File(Environment.getDataDirectory().toString()); // Return the user data directory
+        //file = new File(Environment.getDataDirectory().toString()); // Return the user data directory
+        file = this.getFilesDir();
         File[] list = file.listFiles();
         try {
             for(int i = 0; i < list.length; i++){
@@ -62,9 +86,35 @@ public class TextListActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 TextView textView = (TextView) view;
-                String message = "You clicked # " + position
+                /*String message = "You clicked # " + position
                         + ", which is string: " + textView.getText().toString();
-                Toast.makeText(TextListActivity.this, message, Toast.LENGTH_LONG).show();
+                Toast.makeText(TextListActivity.this, message, Toast.LENGTH_LONG).show();*/
+                File selectedFile = new File(TextListActivity.this.getFilesDir(), textView.getText().toString());
+                //Read text from file
+                StringBuilder text = new StringBuilder();
+
+                try {
+                    BufferedReader br = new BufferedReader(new FileReader(selectedFile));
+                    String line;
+
+                    while ((line = br.readLine()) != null) {
+                        text.append(line);
+                        text.append('\n');
+                    }
+                    if (text.length() > 0)
+                        text.deleteCharAt(text.length() - 1);
+                    br.close();
+                }
+                catch (IOException e) {
+                    //You'll need to add proper error handling here
+                }
+
+                Intent intent = new Intent();
+                intent.putExtra(FILE_CONTENT, text.toString());
+
+                // Set result and finish this Activity
+                setResult(Activity.RESULT_OK, intent);
+                finish();
             }
         });
         addTextToFile("Hello");

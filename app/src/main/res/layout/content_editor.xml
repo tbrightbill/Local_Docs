@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
@@ -11,13 +11,39 @@
 	android:orientation="vertical"
 	app:layout_behavior="@string/appbar_scrolling_view_behavior"
 	tools:context="csm117.localdocs.EditorActivity"
-	tools:showIn="@layout/activity_editor">
+	tools:showIn="@layout/activity_editor"
+	android:weightSum="1">
 
-	<TextView
+	<Button
 		android:layout_width="wrap_content"
-		android:layout_height="0dp"
-		android:layout_weight="1"
-		android:text="Hello World!" />
+		android:layout_height="wrap_content"
+		android:text="Save"
+		android:id="@+id/btnSave"
+		android:enabled="true"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentStart="true"
+		android:layout_marginBottom="122dp" />
+
+	<EditText android:id="@+id/editor"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_above="@+id/btnSave" />
+
+	<Button
+		android:id="@+id/fileList"
+		android:text="List of files"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center|end"
+		android:onClick="switchActivity"
+		android:src="@android:drawable/ic_dialog_email"
+		android:layout_marginLeft="61dp"
+		android:layout_marginBottom="54dp"
+		android:layout_alignParentBottom="true"
+		android:layout_toRightOf="@+id/btnSave"
+		android:layout_toEndOf="@+id/btnSave"
+		android:layout_marginStart="61dp" />
 	<!-- Uncomment the following to test the merge page -->
 	<!-- <Button
 		android:layout_width="wrap_content"
@@ -25,4 +51,4 @@
 		android:text="@string/start_merge"
 		android:onClick="startMerge"
 	/> -->
-</LinearLayout>
+</RelativeLayout>
