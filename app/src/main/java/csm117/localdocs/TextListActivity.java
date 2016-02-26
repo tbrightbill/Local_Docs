@@ -37,12 +37,12 @@ public class TextListActivity extends Activity {
      * Return Intent extra
      */
     public static String FILE_CONTENT = "file_content";
+    public static String FILE_NAME = "file_name";
 
     private File file = null;
     private List<String> myList;
     ListView listView;
     ArrayAdapter<String> adapter;
-    private String[] strings = {"Hi", "Hello", "Good morning"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,24 +71,21 @@ public class TextListActivity extends Activity {
         file = this.getFilesDir();
         File[] list = file.listFiles();
         try {
-            for(int i = 0; i < list.length; i++){
-                myList.add(list[i].getName());
+            for (File aList : list) {
+                myList.add(aList.getName());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         // Display the list
         listView = (ListView) findViewById(R.id.list_view);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, myList);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, myList);
         listView.setAdapter(adapter);
         // Click on an item in the list
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 TextView textView = (TextView) view;
-                /*String message = "You clicked # " + position
-                        + ", which is string: " + textView.getText().toString();
-                Toast.makeText(TextListActivity.this, message, Toast.LENGTH_LONG).show();*/
                 File selectedFile = new File(TextListActivity.this.getFilesDir(), textView.getText().toString());
                 //Read text from file
                 StringBuilder text = new StringBuilder();
@@ -111,6 +108,7 @@ public class TextListActivity extends Activity {
 
                 Intent intent = new Intent();
                 intent.putExtra(FILE_CONTENT, text.toString());
+                intent.putExtra(FILE_NAME, textView.getText().toString());
 
                 // Set result and finish this Activity
                 setResult(Activity.RESULT_OK, intent);
