@@ -52,13 +52,6 @@ public class EditorActivity extends AppCompatActivity {
 
 	private ArrayList<String> receivedData = new ArrayList<>();
 
-
-	// Start the merge activity.  Will later need to get text of merge.
-	public void startMerge(View view) {
-		Intent intent = new Intent(this, MergeActivity.class);
-		startActivity(intent);
-	}
-
 	/*
 		All methods for buttons begin here
 	 */
@@ -336,7 +329,16 @@ public class EditorActivity extends AppCompatActivity {
 					String readMessage = new String(readBuf, 0, msg.arg1);
 					if (readMessage.charAt(0) == 's') {
 						EditText textView = (EditText) activity.findViewById(R.id.editor);
-						textView.setText(readMessage.substring(1), EditText.BufferType.EDITABLE);
+						// To simply accept sent text (overwriting this user's changes),
+						// set the textView's text to the sent message.
+						//textView.setText(readMessage.substring(1), EditText.BufferType.EDITABLE);
+						// To do a 2 merge with the sent text, create and send an intent to 2merge
+						// with both versions.
+						Intent merge2Intent = new Intent(activity, CompareChangeActivity.class);
+						merge2Intent.putExtra(CompareChangeActivity.EXTRA_NEW_VERSION, readMessage);
+						merge2Intent.putExtra(CompareChangeActivity.EXTRA_PREVIOUS_VERSION, textView.getText());
+						activity.startActivityForResult(merge2Intent, REQUEST_2MERGE);
+
 						//mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
 					}
 					else if (readMessage.charAt(0) == 'r') {
