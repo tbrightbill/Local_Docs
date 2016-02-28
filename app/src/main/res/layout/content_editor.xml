@@ -59,10 +59,21 @@
 		android:layout_below="@+id/fileList" />
 
 	<!-- Uncomment the following to test the merge page -->
-	<!-- <Button
+	<Button
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="@string/start_merge"
-		android:onClick="startMerge"
-	/> -->
+		android:text="Test 2 merge"
+		android:id="@+id/test2merge"
+		android:onClick="test2Merge"
+		android:layout_centerHorizontal="true"
+		android:layout_below="@id/fileName" />
+
+	<Button
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Test 3 merge"
+		android:onClick="test3Merge"
+		android:id="@+id/test3merge"
+		android:layout_centerHorizontal="true"
+		android:layout_below="@id/test2merge" />
 </RelativeLayout>

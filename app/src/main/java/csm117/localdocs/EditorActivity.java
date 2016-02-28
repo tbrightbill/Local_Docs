@@ -21,7 +21,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class EditorActivity extends AppCompatActivity {
@@ -30,6 +34,8 @@ public class EditorActivity extends AppCompatActivity {
 	private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
 	private static final int REQUEST_ENABLE_BT = 3;
 	private static final int REQUEST_FILE = 4;
+	private static final int REQUEST_2MERGE = 5;
+	private static final int REQUEST_3MERGE = 6;
 
 	/**
 	 * Name of the connected device
@@ -90,6 +96,74 @@ public class EditorActivity extends AppCompatActivity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void test3Merge(View view) {
+		EditText fileNameField = (EditText) this.findViewById(R.id.fileName);
+		String fileName = fileNameField.getText().toString();
+
+		EditText textView = (EditText) this.findViewById(R.id.editor);
+		String content = textView.getText().toString();
+		StringBuilder builder = new StringBuilder();
+
+		BufferedInputStream inputStream = null;
+		try {
+			inputStream = new BufferedInputStream(openFileInput(fileName));
+			byte[] buffer = new byte[1024];
+			int n;
+			String str = "";
+			while ((n = inputStream.read(buffer)) != -1) {
+				builder.append(new String(buffer, 0, n));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (inputStream != null)
+					inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Intent intent = new Intent(this, MergeActivity.class);
+		intent.putExtra(MergeActivity.EXTRA_MY_VERSION, content);
+		intent.putExtra(MergeActivity.EXTRA_PARENT_VERSION, builder.toString());
+		intent.putExtra(MergeActivity.EXTRA_THEIR_VERSION, "Fun fun funn fun");
+		startActivityForResult(intent, REQUEST_3MERGE);
+	}
+	public void test2Merge(View view) {
+		EditText fileNameField = (EditText) this.findViewById(R.id.fileName);
+		String fileName = fileNameField.getText().toString();
+
+		EditText textView = (EditText) this.findViewById(R.id.editor);
+		String content = textView.getText().toString();
+		StringBuilder builder = new StringBuilder();
+
+		BufferedInputStream inputStream = null;
+		try {
+			inputStream = new BufferedInputStream(openFileInput(fileName));
+			byte[] buffer = new byte[1024];
+			int n;
+			String str = "";
+			while ((n = inputStream.read(buffer)) != -1) {
+				builder.append(new String(buffer, 0, n));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (inputStream != null)
+					inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Intent intent = new Intent(this, CompareChangeActivity.class);
+		intent.putExtra(CompareChangeActivity.EXTRA_NEW_VERSION, content);
+		intent.putExtra(CompareChangeActivity.EXTRA_PREVIOUS_VERSION, builder.toString());
+		startActivityForResult(intent, REQUEST_2MERGE);
 	}
 	/*
 		End button methods
@@ -349,6 +423,20 @@ public class EditorActivity extends AppCompatActivity {
 					EditText fileName = (EditText) this.findViewById(R.id.fileName);
 					if (name != null)
 						fileName.setText(name, EditText.BufferType.EDITABLE);
+				}
+				break;
+			case REQUEST_3MERGE:
+				if (resultCode == Activity.RESULT_OK) {
+					String content = data.getStringExtra(MergeActivity.EXTRA_MERGED);
+					EditText textView = (EditText) findViewById(R.id.editor);
+					textView.setText(content, EditText.BufferType.EDITABLE);
+				}
+				break;
+			case REQUEST_2MERGE:
+				if (resultCode == Activity.RESULT_OK) {
+					String content = data.getStringExtra(CompareChangeActivity.EXTRA_ACCEPTED_CHANGES);
+					EditText textView = (EditText) findViewById(R.id.editor);
+					textView.setText(content, EditText.BufferType.EDITABLE);
 				}
 				break;
 		}
