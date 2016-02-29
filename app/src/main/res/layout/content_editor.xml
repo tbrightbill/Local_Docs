@@ -20,15 +20,23 @@
 		android:text="Save"
 		android:id="@+id/btnSave"
 		android:enabled="true"
+		android:onClick="saveDoc"
+		android:layout_marginBottom="126dp"
 		android:layout_alignParentBottom="true"
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentStart="true"
-		android:layout_marginBottom="122dp" />
+		android:layout_alignRight="@+id/editor"
+		android:layout_alignEnd="@+id/editor" />
 
 	<EditText android:id="@+id/editor"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_above="@+id/btnSave" />
+		android:layout_above="@+id/btnSave"
+		android:layout_alignParentTop="true"
+		android:allowUndo="true"
+		android:editable="true"
+		android:elegantTextHeight="true"
+		android:focusable="true"
+		android:enabled="true"
+		android:nestedScrollingEnabled="true" />
 
 	<Button
 		android:id="@+id/fileList"
@@ -36,19 +44,36 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center|end"
-		android:onClick="switchActivity"
+		android:onClick="showFileList"
 		android:src="@android:drawable/ic_dialog_email"
-		android:layout_marginLeft="61dp"
-		android:layout_marginBottom="54dp"
-		android:layout_alignParentBottom="true"
-		android:layout_toRightOf="@+id/btnSave"
-		android:layout_toEndOf="@+id/btnSave"
-		android:layout_marginStart="61dp" />
-	<!-- Uncomment the following to test the merge page -->
-	<!-- <Button
+		android:layout_alignTop="@+id/btnSave"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentStart="true" />
+
+	<EditText
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="@string/start_merge"
-		android:onClick="startMerge"
-	/> -->
+		android:id="@+id/fileName"
+		android:layout_centerHorizontal="true"
+		android:hint="File Name"
+		android:layout_below="@+id/fileList" />
+
+	<!-- Uncomment the following to test the merge page -->
+	<Button
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Test 2 merge"
+		android:id="@+id/test2merge"
+		android:onClick="test2Merge"
+		android:layout_centerHorizontal="true"
+		android:layout_below="@id/fileName" />
+
+	<Button
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Test 3 merge"
+		android:onClick="test3Merge"
+		android:id="@+id/test3merge"
+		android:layout_centerHorizontal="true"
+		android:layout_below="@id/test2merge" />
 </RelativeLayout>

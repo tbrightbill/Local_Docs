@@ -31,11 +31,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="csm117.localdocs.EditorActivity"/>
 
-            <!-- <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter> -->
+            </intent-filter>-->
         </activity>
         <activity
             android:name=".TextListActivity"
@@ -47,7 +47,7 @@
             android:label="@string/select_device"
             android:theme="@android:style/Theme.Holo.Dialog"/>
         <activity
-            android:name="csm117.diff.CompareChangeActivity"
+            android:name=".CompareChangeActivity"
             android:label="@string/title_activity_compare_change"
             android:parentActivityName=".EditorActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -55,12 +55,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="csm117.localdocs.EditorActivity"/>
 
-            <!-- <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter> -->
         </activity>
+		
+		<activity android:name=".Pop"></activity>
     </application>
 
 </manifest>

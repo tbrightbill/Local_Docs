@@ -1,30 +1,32 @@
 package csm117.localdocs;
 
 import android.app.ActionBar;
-import android.app.AlertDialog;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
-import android.view.View;
-import android.view.View.OnClickListener;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.content.Intent;
-import android.app.Activity;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.Button;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class EditorActivity extends AppCompatActivity {
@@ -33,6 +35,8 @@ public class EditorActivity extends AppCompatActivity {
 	private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
 	private static final int REQUEST_ENABLE_BT = 3;
 	private static final int REQUEST_FILE = 4;
+	private static final int REQUEST_2MERGE = 5;
+	private static final int REQUEST_3MERGE = 6;
 
 	/**
 	 * Name of the connected device
@@ -45,78 +49,152 @@ public class EditorActivity extends AppCompatActivity {
 	/**
 	 * Member object for the bluetooth services
 	 */
-	//private BluetoothService mChatService = null;
-	private ArrayList<BluetoothService> mServices = new ArrayList<BluetoothService>();
+	private ArrayList<BluetoothService> mServices = new ArrayList<>();
 
-	private ArrayList<String> receivedData = new ArrayList<String>();
+	private ArrayList<String> receivedData = new ArrayList<>();
 
-
-	// Start the merge activity.  Will later need to get text of merge.
-	public void startMerge(View view) {
-		Intent intent = new Intent(this, MergeActivity.class);
-		startActivity(intent);
+	/*
+		All methods for buttons begin here
+	 */
+	public void sendDocumentButton(View view) {
+		Snackbar.make(view, "Sent doc", Snackbar.LENGTH_LONG)
+				.setAction("Action", null).show();
+		EditText textView = (EditText) findViewById(R.id.editor);
+		String message = "s" + textView.getText().toString();
+		sendMessage(message);
 	}
+
+	public void retrieveDocumentButton(View view) {
+		Snackbar.make(view, "Retrieved doc", Snackbar.LENGTH_LONG)
+				.setAction("Action", null).show();
+		String message = "r";
+		sendMessage(message);
+	}
+
+	public void showFileList(View view) {
+		Intent intent = new Intent(this, TextListActivity.class);
+		startActivityForResult(intent, REQUEST_FILE);
+	}
+
+	public void saveDoc(View view) {
+		EditText fileNameField = (EditText) this.findViewById(R.id.fileName);
+		String fileName = fileNameField.getText().toString();
+
+		EditText textView = (EditText) this.findViewById(R.id.editor);
+		String content = textView.getText().toString();
+
+		try {
+			FileOutputStream outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
+			outputStream.write(content.getBytes());
+			outputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void test3Merge(View view) {
+		EditText fileNameField = (EditText) this.findViewById(R.id.fileName);
+		String fileName = fileNameField.getText().toString();
+
+		EditText textView = (EditText) this.findViewById(R.id.editor);
+		String content = textView.getText().toString();
+		StringBuilder builder = new StringBuilder();
+
+		BufferedInputStream inputStream = null;
+		try {
+			inputStream = new BufferedInputStream(openFileInput(fileName));
+			byte[] buffer = new byte[1024];
+			int n;
+			String str = "";
+			while ((n = inputStream.read(buffer)) != -1) {
+				builder.append(new String(buffer, 0, n));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (inputStream != null)
+					inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Intent intent = new Intent(this, MergeActivity.class);
+		intent.putExtra(MergeActivity.EXTRA_MY_VERSION, content);
+		intent.putExtra(MergeActivity.EXTRA_PARENT_VERSION, builder.toString());
+		intent.putExtra(MergeActivity.EXTRA_THEIR_VERSION, "Fun fun funn fun");
+		startActivityForResult(intent, REQUEST_3MERGE);
+	}
+	public void test2Merge(View view) {
+		EditText fileNameField = (EditText) this.findViewById(R.id.fileName);
+		String fileName = fileNameField.getText().toString();
+
+		EditText textView = (EditText) this.findViewById(R.id.editor);
+		String content = textView.getText().toString();
+		StringBuilder builder = new StringBuilder();
+
+		BufferedInputStream inputStream = null;
+		try {
+			inputStream = new BufferedInputStream(openFileInput(fileName));
+			byte[] buffer = new byte[1024];
+			int n;
+			String str = "";
+			while ((n = inputStream.read(buffer)) != -1) {
+				builder.append(new String(buffer, 0, n));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (inputStream != null)
+					inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Intent intent = new Intent(this, CompareChangeActivity.class);
+		intent.putExtra(CompareChangeActivity.EXTRA_NEW_VERSION, content);
+		intent.putExtra(CompareChangeActivity.EXTRA_PREVIOUS_VERSION, builder.toString());
+		startActivityForResult(intent, REQUEST_2MERGE);
+	}
+	/*
+		End button methods
+	 */
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_editor);
+
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Snackbar.make(view, "Sent doc", Snackbar.LENGTH_LONG)
-						.setAction("Action", null).show();
-				EditText textView = (EditText) findViewById(R.id.editor);
-				String message = "s" + textView.getText().toString();
-				sendMessage(message);
-			}
-		});
-
-		FloatingActionButton fabRetrieve = (FloatingActionButton) findViewById(R.id.fabRetrieve);
-		fabRetrieve.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Snackbar.make(view, "Retrieved doc", Snackbar.LENGTH_LONG)
-						.setAction("Action", null).show();
-				EditText textView = (EditText) findViewById(R.id.editor);
-				String message = "r";
-				sendMessage(message);
-			}
-		});
-
-		Button fileList = (Button)findViewById(R.id.fileList);
-		fileList.setOnClickListener(new OnClickListener()
-		{   public void onClick(View v)
-			{
-				Intent intent = new Intent(EditorActivity.this, TextListActivity.class);
-				startActivityForResult(intent, REQUEST_FILE);
-				//finish();
-			}
-		});
-
-		Button btnSave = (Button)findViewById(R.id.btnSave);
-		btnSave.setOnClickListener(new OnClickListener()
-		{   public void onClick(View v)
-			{
-				//create demo file
-				String filename = "testfile";
-				EditText textView = (EditText) EditorActivity.this.findViewById(R.id.editor);
-				String content = textView.getText().toString();
-				FileOutputStream outputStream;
-				try {
-					outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-					outputStream.write(content.getBytes());
-					outputStream.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+		EditText fileName = (EditText) findViewById(R.id.fileName);
+		final Button btnSave = (Button) findViewById(R.id.btnSave);
+
+
+		fileName.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				btnSave.setEnabled(!s.toString().trim().isEmpty());
+			}
+		});
+
+		mHandler = new BluetoothHandler(this);
 	}
 
 	private void sendMessage(String message) {
@@ -136,13 +214,6 @@ public class EditorActivity extends AppCompatActivity {
 			}
 		}
 	}
-
-//	public void switchActivity(View view)
-//	{
-//		Intent intent = new Intent(EditorActivity.this, TextListActivity.class);
-//		startActivity(intent);
-//	}
-
 
 	@Override
 	public void onStart() {
@@ -172,7 +243,6 @@ public class EditorActivity extends AppCompatActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		Toast.makeText(EditorActivity.this, "On Resume ", Toast.LENGTH_SHORT).show();
 
 		// Performing this check in onResume() covers the case in which BT was
 		// not enabled during onStart(), so we were paused to enable it...
@@ -200,17 +270,17 @@ public class EditorActivity extends AppCompatActivity {
 			startActivity(discoverableIntent);
 		}
 	}
+
 	/**
 	 * Updates the status on the action bar.
 	 *
 	 * @param resId a string resource ID
 	 */
 	private void setStatus(int resId) {
-		final ActionBar actionBar = this.getActionBar();
-		if (null == actionBar) {
-			return;
+		ActionBar actionBar = this.getActionBar();
+		if (actionBar != null) {
+			actionBar.setSubtitle(resId);
 		}
-		actionBar.setSubtitle(resId);
 	}
 
 	/**
@@ -219,32 +289,34 @@ public class EditorActivity extends AppCompatActivity {
 	 * @param subTitle status
 	 */
 	private void setStatus(CharSequence subTitle) {
-		final ActionBar actionBar = this.getActionBar();
-		if (null == actionBar) {
-			return;
+		ActionBar actionBar = getActionBar();
+		if (actionBar != null) {
+			actionBar.setSubtitle(subTitle);
 		}
-		actionBar.setSubtitle(subTitle);
 	}
 
-	/**
-	 * The Handler that gets information back from the BluetoothChatService
-	 */
-	private final Handler mHandler = new Handler() {
+	private static class BluetoothHandler extends Handler {
+		private EditorActivity activity;
+
+		public BluetoothHandler(EditorActivity activity) {
+			this.activity = activity;
+ 		}
+
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 				case Constants.MESSAGE_STATE_CHANGE:
 					switch (msg.arg1) {
 						case BluetoothService.STATE_CONNECTED:
-							setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
-							setupChat();
+							activity.setStatus(activity.getString(R.string.title_connected_to, activity.mConnectedDeviceName));
+							activity.setupChat();
 							break;
 						case BluetoothService.STATE_CONNECTING:
-							setStatus(R.string.title_connecting);
+							activity.setStatus(R.string.title_connecting);
 							break;
 						case BluetoothService.STATE_LISTEN:
 						case BluetoothService.STATE_NONE:
-							setStatus(R.string.title_not_connected);
+							activity.setStatus(R.string.title_not_connected);
 							break;
 					}
 					break;
@@ -259,29 +331,43 @@ public class EditorActivity extends AppCompatActivity {
 					// construct a string from the valid bytes in the buffer
 					String readMessage = new String(readBuf, 0, msg.arg1);
 					if (readMessage.charAt(0) == 's') {
-						EditText textView = (EditText) EditorActivity.this.findViewById(R.id.editor);
-						textView.setText(readMessage.substring(1), EditText.BufferType.EDITABLE);
+						EditText textView = (EditText) activity.findViewById(R.id.editor);
+						// To simply accept sent text (overwriting this user's changes),
+						// set the textView's text to the sent message.
+						//textView.setText(readMessage.substring(1), EditText.BufferType.EDITABLE);
+						// To do a 2 merge with the sent text, create and send an intent to 2merge
+						// with both versions.
+						Intent merge2Intent = new Intent(activity, CompareChangeActivity.class);
+						merge2Intent.putExtra(CompareChangeActivity.EXTRA_NEW_VERSION, readMessage.substring(1));
+						merge2Intent.putExtra(CompareChangeActivity.EXTRA_PREVIOUS_VERSION, textView.getText().toString());
+						activity.startActivityForResult(merge2Intent, REQUEST_2MERGE);
+
 						//mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
 					}
 					else if (readMessage.charAt(0) == 'r') {
-						EditText textView = (EditText) EditorActivity.this.findViewById(R.id.editor);
+						EditText textView = (EditText) activity.findViewById(R.id.editor);
 						String message = "s" + textView.getText().toString();
-						EditorActivity.this.sendMessage(message);
+						activity.sendMessage(message);
 					}
 					break;
 				case Constants.MESSAGE_DEVICE_NAME:
 					// save the connected device's name
-					mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
-						Toast.makeText(EditorActivity.this, "Connected to "
-								+ mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+					activity.mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
+					Toast.makeText(activity, "Connected to "
+							+ activity.mConnectedDeviceName, Toast.LENGTH_SHORT).show();
 					break;
 				case Constants.MESSAGE_TOAST:
-						Toast.makeText(EditorActivity.this, msg.getData().getString(Constants.TOAST),
-								Toast.LENGTH_SHORT).show();
+					Toast.makeText(activity, msg.getData().getString(Constants.TOAST),
+							Toast.LENGTH_SHORT).show();
 					break;
 			}
 		}
-	};
+	}
+
+	/**
+	 * The Handler that gets information back from the BluetoothChatService
+	 */
+	private BluetoothHandler mHandler;
 
 	private void setupChat() {
 		boolean started = false;
@@ -303,6 +389,7 @@ public class EditorActivity extends AppCompatActivity {
 			mServices.get(mServices.size() - 1).start();
 		}
 	}
+
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 			case REQUEST_CONNECT_DEVICE_SECURE:
@@ -333,7 +420,27 @@ public class EditorActivity extends AppCompatActivity {
 				if (resultCode == Activity.RESULT_OK) {
 					String content = data.getExtras()
 							.getString(TextListActivity.FILE_CONTENT);
-					EditText textView = (EditText) EditorActivity.this.findViewById(R.id.editor);
+					EditText textView = (EditText) this.findViewById(R.id.editor);
+					textView.setText(content, EditText.BufferType.EDITABLE);
+
+					String name = data.getExtras()
+							.getString(TextListActivity.FILE_NAME);
+					EditText fileName = (EditText) this.findViewById(R.id.fileName);
+					if (name != null)
+						fileName.setText(name, EditText.BufferType.EDITABLE);
+				}
+				break;
+			case REQUEST_3MERGE:
+				if (resultCode == Activity.RESULT_OK) {
+					String content = data.getStringExtra(MergeActivity.EXTRA_MERGED);
+					EditText textView = (EditText) findViewById(R.id.editor);
+					textView.setText(content, EditText.BufferType.EDITABLE);
+				}
+				break;
+			case REQUEST_2MERGE:
+				if (resultCode == Activity.RESULT_OK) {
+					String content = data.getStringExtra(CompareChangeActivity.EXTRA_ACCEPTED_CHANGES);
+					EditText textView = (EditText) findViewById(R.id.editor);
 					textView.setText(content, EditText.BufferType.EDITABLE);
 				}
 				break;
