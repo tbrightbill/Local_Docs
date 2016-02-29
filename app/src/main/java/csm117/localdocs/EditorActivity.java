@@ -335,8 +335,8 @@ public class EditorActivity extends AppCompatActivity {
 						// To do a 2 merge with the sent text, create and send an intent to 2merge
 						// with both versions.
 						Intent merge2Intent = new Intent(activity, CompareChangeActivity.class);
-						merge2Intent.putExtra(CompareChangeActivity.EXTRA_NEW_VERSION, readMessage);
-						merge2Intent.putExtra(CompareChangeActivity.EXTRA_PREVIOUS_VERSION, textView.getText());
+						merge2Intent.putExtra(CompareChangeActivity.EXTRA_NEW_VERSION, readMessage.substring(1));
+						merge2Intent.putExtra(CompareChangeActivity.EXTRA_PREVIOUS_VERSION, textView.getText().toString());
 						activity.startActivityForResult(merge2Intent, REQUEST_2MERGE);
 
 						//mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
