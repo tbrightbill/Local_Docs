@@ -11,4 +11,15 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 	</ListView>
+
+	<Button
+		android:id="@+id/create_new_doc"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:text="Create New Doc"
+		android:onClick="selfDestruct"
+		android:layout_alignParentTop="true"
+		android:layout_alignRight="@+id/list_view"
+		android:layout_alignEnd="@+id/list_view">
+	</Button>
 </RelativeLayout>
