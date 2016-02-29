@@ -193,6 +193,8 @@ public class EditorActivity extends AppCompatActivity {
 				btnSave.setEnabled(!s.toString().trim().isEmpty());
 			}
 		});
+
+		mHandler = new BluetoothHandler(this);
 	}
 
 	private void sendMessage(String message) {
@@ -365,7 +367,7 @@ public class EditorActivity extends AppCompatActivity {
 	/**
 	 * The Handler that gets information back from the BluetoothChatService
 	 */
-	private final BluetoothHandler mHandler = new BluetoothHandler(this);
+	private BluetoothHandler mHandler;
 
 	private void setupChat() {
 		boolean started = false;

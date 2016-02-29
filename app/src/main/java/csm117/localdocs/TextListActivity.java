@@ -1,5 +1,7 @@
 package csm117.localdocs;
 
+import android.view.MenuItem;
+import android.view.ContextMenu;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -20,6 +22,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -81,6 +85,7 @@ public class TextListActivity extends Activity {
         listView = (ListView) findViewById(R.id.list_view);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, myList);
         listView.setAdapter(adapter);
+        registerForContextMenu(listView);
         // Click on an item in the list
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -106,22 +111,71 @@ public class TextListActivity extends Activity {
                     //You'll need to add proper error handling here
                 }
 
-                startActivity((new Intent(TextListActivity.this, Pop.class)));
-//                Intent intent = new Intent();
-//                intent.putExtra(FILE_CONTENT, text.toString());
-//                intent.putExtra(FILE_NAME, textView.getText().toString());
+                //startActivity((new Intent(TextListActivity.this, Pop.class)));
+                Intent intent = new Intent();
+                intent.putExtra(FILE_CONTENT, text.toString());
+                intent.putExtra(FILE_NAME, textView.getText().toString());
 
                 // Set result and finish this Activity
-                // setResult(Activity.RESULT_OK, intent);
+                 setResult(Activity.RESULT_OK, intent);
                 finish();
             }
         });
         addTextToFile("Hello");
     }
 
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        if(v.getId() == R.id.list_view) {
-            AdapterView.AdapterContextMenuInfo info = (A)
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId()==R.id.list_view) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            File[] list = file.listFiles();
+            menu.setHeaderTitle(list[info.position].getName());
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu_file_context, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.open:
+                File[] list = file.listFiles();
+                File selectedFile = list[info.position];
+                //Read text from file
+                StringBuilder text = new StringBuilder();
+
+                try {
+                    BufferedReader br = new BufferedReader(new FileReader(selectedFile));
+                    String line;
+
+                    while ((line = br.readLine()) != null) {
+                        text.append(line);
+                        text.append('\n');
+                    }
+                    if (text.length() > 0)
+                        text.deleteCharAt(text.length() - 1);
+                    br.close();
+                }
+                catch (IOException e) {
+                    //You'll need to add proper error handling here
+                }
+                Intent intent = new Intent();
+                intent.putExtra(FILE_CONTENT, text.toString());
+                intent.putExtra(FILE_NAME, selectedFile.getName());
+
+                // Set result and finish this Activity
+                setResult(Activity.RESULT_OK, intent);
+                finish();
+                return true;
+            case R.id.rename:
+                //editNote(info.id);
+                return true;
+            case R.id.delete:
+                //deleteNote(info.id);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
         }
     }
 
