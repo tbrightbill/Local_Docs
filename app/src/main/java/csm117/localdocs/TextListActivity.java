@@ -1,5 +1,6 @@
 package csm117.localdocs;
 
+import android.content.DialogInterface;
 import android.view.MenuItem;
 import android.view.ContextMenu;
 import java.io.FileInputStream;
@@ -32,7 +33,7 @@ import android.widget.Toast;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-
+import android.app.AlertDialog;
 
 public class TextListActivity extends Activity {
 
@@ -58,6 +59,47 @@ public class TextListActivity extends Activity {
         //requires user to press the button
         listButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+                /*
+
+                // This part is to ask the user the type in the file name after creating new doc
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(TextListActivity.this);
+                alertDialog.setTitle("Create New File");
+                alertDialog.setMessage("Enter File Name");
+
+                final EditText input = new EditText(TextListActivity.this);
+                alertDialog.setView(input);
+
+                alertDialog.setPositiveButton("YES",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                String filename = input.getText().toString();
+                                if (filename.compareTo("") == 0) {
+                                    if (pass.equals(password)) {
+                                        Toast.makeText(getApplicationContext(),
+                                                "Password Matched", Toast.LENGTH_SHORT).show();
+                                        Intent myIntent1 = new Intent(view.getContext(),
+                                                Show.class);
+                                        startActivityForResult(myIntent1, 0);
+                                    } else {
+                                        Toast.makeText(getApplicationContext(),
+                                                "Wrong Password!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }
+                        });
+
+                alertDialog.setNegativeButton("NO",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                alertDialog.show();
+
+                */
+
                 String filename = "new_file";
                 File selectedFile = new File(TextListActivity.this.getFilesDir(), filename);
                 if (!selectedFile.exists()) {
@@ -195,6 +237,27 @@ public class TextListActivity extends Activity {
                 return true;
             case R.id.delete:
                 //deleteNote(info.id);
+                File[] list2 = file.listFiles();
+                File selectedFile2 = list2[info.position];
+                selectedFile2.delete();
+
+                // Obtain file names from internal storage
+                myList = new ArrayList<>();
+                //file = new File(Environment.getDataDirectory().toString()); // Return the user data directory
+                file = TextListActivity.this.getFilesDir();
+                File[] list3 = file.listFiles();
+                try {
+                    for (File aList : list3) {
+                        myList.add(aList.getName());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                // Display the list
+                listView = (ListView) findViewById(R.id.list_view);
+                adapter = new ArrayAdapter<String>(TextListActivity.this, android.R.layout.simple_list_item_1, myList);
+                listView.setAdapter(adapter);
+
                 return true;
             default:
                 return super.onContextItemSelected(item);
