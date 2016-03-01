@@ -19,7 +19,7 @@
 		android:layout_height="wrap_content"
 		android:text="Save"
 		android:id="@+id/btnSave"
-		android:enabled="true"
+		android:enabled="false"
 		android:onClick="saveDoc"
 		android:layout_marginBottom="126dp"
 		android:layout_alignParentBottom="true"
