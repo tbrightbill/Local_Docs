@@ -72,6 +72,22 @@ public class TextListActivity extends Activity {
                         e.printStackTrace();
                     }
                 }
+                // Obtain file names from internal storage
+                myList = new ArrayList<>();
+                //file = new File(Environment.getDataDirectory().toString()); // Return the user data directory
+                file = TextListActivity.this.getFilesDir();
+                File[] list = file.listFiles();
+                try {
+                    for (File aList : list) {
+                        myList.add(aList.getName());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                // Display the list
+                listView = (ListView) findViewById(R.id.list_view);
+                adapter = new ArrayAdapter<String>(TextListActivity.this, android.R.layout.simple_list_item_1, myList);
+                listView.setAdapter(adapter);
             }
         });
 
