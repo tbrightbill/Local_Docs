@@ -106,17 +106,25 @@ public class TextListActivity extends Activity {
                     //You'll need to add proper error handling here
                 }
 
-                Intent intent = new Intent();
-                intent.putExtra(FILE_CONTENT, text.toString());
-                intent.putExtra(FILE_NAME, textView.getText().toString());
+                startActivity((new Intent(TextListActivity.this, Pop.class)));
+//                Intent intent = new Intent();
+//                intent.putExtra(FILE_CONTENT, text.toString());
+//                intent.putExtra(FILE_NAME, textView.getText().toString());
 
                 // Set result and finish this Activity
-                setResult(Activity.RESULT_OK, intent);
+                // setResult(Activity.RESULT_OK, intent);
                 finish();
             }
         });
         addTextToFile("Hello");
     }
+
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        if(v.getId() == R.id.list_view) {
+            AdapterView.AdapterContextMenuInfo info = (A)
+        }
+    }
+
     // create a file and add text to it
     public void addTextToFile(String text) {
         File logFile = new File("usbStorage/" + "MyFile.txt");
@@ -135,7 +143,14 @@ public class TextListActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
+
+    public void deleteAFile(String path) {
+        File file = new File(path);
+        boolean deleted = file.delete();
+    }
+
 /*
     public void writeToFile() {
         try {

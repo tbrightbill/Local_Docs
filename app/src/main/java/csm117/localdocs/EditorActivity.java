@@ -17,6 +17,7 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -181,7 +182,7 @@ public class EditorActivity extends AppCompatActivity {
 
 		EditText fileName = (EditText) findViewById(R.id.fileName);
 		final Button btnSave = (Button) findViewById(R.id.btnSave);
-		btnSave.setEnabled(!fileName.getText().toString().trim().isEmpty());
+
 
 		fileName.addTextChangedListener(new TextWatcher() {
 			@Override
