@@ -53,6 +53,7 @@ public class TextListActivity extends Activity {
         setContentView(R.layout.file_list);
         Button listButton = (Button) findViewById(R.id.create_new_doc);
 
+        /*
         //button on top to create a new file
         //requires user to press the button
         listButton.setOnClickListener(new View.OnClickListener() {
@@ -73,7 +74,25 @@ public class TextListActivity extends Activity {
                 }
             }
         });
+        */
 
+        // create dummy file
+        public void onClick(View v) {
+            String filename = "new_file";
+            File selectedFile = new File(TextListActivity.this.getFilesDir(), filename);
+            if (!selectedFile.exists()) {
+                // String content = "Hello world!";
+                String content = "";    // empty string
+                FileOutputStream outputStream;
+                try {
+                    outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                    outputStream.write(content.getBytes());
+                    outputStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         // Obtain file names from internal storage
         myList = new ArrayList<>();
