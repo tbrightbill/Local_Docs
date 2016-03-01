@@ -349,6 +349,10 @@ public class EditorActivity extends AppCompatActivity {
 						String message = "s" + textView.getText().toString();
 						activity.sendMessage(message);
 					}
+					else if (readMessage.charAt(0) == 'm') {
+						EditText textView = (EditText) activity.findViewById(R.id.editor);
+						textView.setText(readMessage.substring(1), EditText.BufferType.EDITABLE);
+					}
 					break;
 				case Constants.MESSAGE_DEVICE_NAME:
 					// save the connected device's name
@@ -442,6 +446,9 @@ public class EditorActivity extends AppCompatActivity {
 					String content = data.getStringExtra(CompareChangeActivity.EXTRA_ACCEPTED_CHANGES);
 					EditText textView = (EditText) findViewById(R.id.editor);
 					textView.setText(content, EditText.BufferType.EDITABLE);
+					if (mBluetoothAdapter != null) {
+						sendMessage ("m" + content);
+					}
 				}
 				break;
 		}

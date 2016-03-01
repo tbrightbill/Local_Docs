@@ -151,7 +151,7 @@ public class CompareChangeActivity extends AppCompatActivity {
 					if (inserting)
 						changedText.setBackgroundResource(R.color.colorGreen);
 					else
-						changedText.setBackgroundResource(R.color.colorRed);
+						changedText.setBackgroundResource(R.color.colorBlue);
 					relative = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 					relative.addRule(RelativeLayout.RIGHT_OF, id);
 					//relative.addRule(RelativeLayout.BELOW, id);
@@ -231,9 +231,7 @@ public class CompareChangeActivity extends AppCompatActivity {
 			// Remove the buttons
 			views.get(0).setVisibility(View.GONE);
 			views.get(views.size()-1).setVisibility(View.GONE);
-			boolean isInsert = diff.getChanges().get(start_index).isInsert;
-			if (choice == Choice.ACCEPT && !isInsert ||
-					choice == Choice.REJECT && isInsert) {
+			if (choice == Choice.REJECT) {
 				// If an insert was rejected,
 				// Or if a deletion was accepted, remove said text.
 				for (int i = 1; i < views.size() - 1; i++) {
