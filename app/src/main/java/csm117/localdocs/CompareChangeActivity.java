@@ -277,12 +277,11 @@ public class CompareChangeActivity extends AppCompatActivity {
 				j++;
 			}
 			while (e != null && j >= e.index) {
-				if (decisions[i] == Choice.ACCEPT) {
-					if (e.isInsert) {
-						merged += e.change;
-					} else {
-						j++;
-					}
+				if (decisions[i] == Choice.ACCEPT && e.isInsert) {
+					merged += e.change;
+				}
+				if (decisions[i] == Choice.REJECT && !e.isInsert) {
+					j++;
 				}
 				// That edit was handled, move on to next.
 				i++;
