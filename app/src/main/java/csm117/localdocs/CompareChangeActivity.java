@@ -154,6 +154,7 @@ public class CompareChangeActivity extends AppCompatActivity {
 						changedText.setBackgroundResource(R.color.colorBlue);
 					relative = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 					relative.addRule(RelativeLayout.RIGHT_OF, id);
+					relative.addRule(RelativeLayout.LEFT_OF, id+2);
 					//relative.addRule(RelativeLayout.BELOW, id);
 					//relative.addRule(RelativeLayout.END_OF, id);
 					if (id > 1)
@@ -167,9 +168,10 @@ public class CompareChangeActivity extends AppCompatActivity {
 					reject.setOnClickListener(
 							new DecisionListener(Choice.REJECT, editStart, i, line));
 					relative = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-					relative.addRule(RelativeLayout.RIGHT_OF, id+1);
+					//relative.addRule(RelativeLayout.RIGHT_OF, id+1);
 					//relative.addRule(RelativeLayout.BELOW, id+1);
 					//relative.addRule(RelativeLayout.END_OF, id+1);
+					relative.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 					if (id > 1)
 						relative.addRule(RelativeLayout.BELOW, previousRowId);
 					relative.addRule(RelativeLayout.ALIGN_BASELINE, id+1);
