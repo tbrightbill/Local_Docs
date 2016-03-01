@@ -2,11 +2,18 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$USER_HOME$/AndroidStudioProjects/Local_Docs/app/build/intermediates/exploded-aar/com.android.support/design/23.1.1/23.1.1.iml" filepath="$USER_HOME$/AndroidStudioProjects/Local_Docs/app/build/intermediates/exploded-aar/com.android.support/design/23.1.1/23.1.1.iml" />
+      <module fileurl="file://$USER_HOME$/AndroidStudioProjects/Local_Docs/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.1.1/23.1.1.iml" filepath="$USER_HOME$/AndroidStudioProjects/Local_Docs/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.1.1/23.1.1.iml" />
+      <module fileurl="file://$USER_HOME$/AndroidStudioProjects/Local_Docs/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/23.1.1.iml" filepath="$USER_HOME$/AndroidStudioProjects/Local_Docs/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/23.1.1.iml" />
       <module fileurl="file://$PROJECT_DIR$/Local_Docs.iml" filepath="$PROJECT_DIR$/Local_Docs.iml" />
       <module fileurl="file://$PROJECT_DIR$/Local_Docs.iml" filepath="$PROJECT_DIR$/Local_Docs.iml" />
       <module fileurl="file://$PROJECT_DIR$/Local_Docs 1.iml" filepath="$PROJECT_DIR$/Local_Docs 1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/src/androidTest/androidTest2.iml" filepath="$PROJECT_DIR$/app/src/androidTest/androidTest2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$USER_HOME$/AndroidStudioProjects/Local_Docs/app/build/intermediates/manifests/full/debug/debug.iml" filepath="$USER_HOME$/AndroidStudioProjects/Local_Docs/app/build/intermediates/manifests/full/debug/debug.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/src/main/main1.iml" filepath="$PROJECT_DIR$/app/src/main/main1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/src/test/test1.iml" filepath="$PROJECT_DIR$/app/src/test/test1.iml" />
     </modules>
   </component>
 </project>

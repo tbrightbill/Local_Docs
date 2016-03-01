@@ -51,9 +51,9 @@ public class CompareChangeActivity extends AppCompatActivity {
 		String next = intent.getStringExtra(EXTRA_NEW_VERSION);
 		// For testing, if not started by another activity.
 		if (prior == null)
-			prior = "come and learn about TLF's FREE programs (Scholarships, Mentoring, Job/Internship Placement and Career and Professional Development Workshops) that we provide for students pursuing a career in advertising, marketing and public relations.";
+			prior = "";
 		if (next == null)
-			next = "Come and learn about the LAGRANT Foundation's free programs that we provide for students pursuing a career in advertising, marketing and public relations!";
+			next = "";
 		diff = Diff.createDiff(prior, next);
 		RelativeLayout layout = (RelativeLayout) findViewById(R.id.compare_layout);
 
@@ -98,7 +98,7 @@ public class CompareChangeActivity extends AppCompatActivity {
 				}
 				else {
 					relative.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-					relative.addRule(RelativeLayout.ALIGN_PARENT_START);
+					//relative.addRule(RelativeLayout.ALIGN_PARENT_START);
 					relative.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 				}
 				sameText.setLayoutParams(relative);
@@ -117,7 +117,7 @@ public class CompareChangeActivity extends AppCompatActivity {
 							new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 					);
 					subLayout.setOrientation(LinearLayout.HORIZONTAL);*/
-					ArrayList<View> line = new ArrayList<View>();
+					ArrayList<View> line = new ArrayList<>();
 					Button accept = new Button(this);
 					Button reject = new Button(this);
 					TextView changedText = new TextView(this);
@@ -141,7 +141,7 @@ public class CompareChangeActivity extends AppCompatActivity {
 					}
 					else {
 						relative.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-						relative.addRule(RelativeLayout.ALIGN_PARENT_START);
+						//relative.addRule(RelativeLayout.ALIGN_PARENT_START);
 						relative.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 					}
 					accept.setLayoutParams(relative);
@@ -155,7 +155,7 @@ public class CompareChangeActivity extends AppCompatActivity {
 					relative = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 					relative.addRule(RelativeLayout.RIGHT_OF, id);
 					//relative.addRule(RelativeLayout.BELOW, id);
-					relative.addRule(RelativeLayout.END_OF, id);
+					//relative.addRule(RelativeLayout.END_OF, id);
 					if (id > 1)
 						relative.addRule(RelativeLayout.BELOW, previousRowId);
 					relative.addRule(RelativeLayout.ALIGN_BASELINE, id);
@@ -169,7 +169,7 @@ public class CompareChangeActivity extends AppCompatActivity {
 					relative = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 					relative.addRule(RelativeLayout.RIGHT_OF, id+1);
 					//relative.addRule(RelativeLayout.BELOW, id+1);
-					relative.addRule(RelativeLayout.END_OF, id+1);
+					//relative.addRule(RelativeLayout.END_OF, id+1);
 					if (id > 1)
 						relative.addRule(RelativeLayout.BELOW, previousRowId);
 					relative.addRule(RelativeLayout.ALIGN_BASELINE, id+1);
