@@ -48,6 +48,7 @@ public class TextListActivity extends Activity {
     private List<String> myList;
     ListView listView;
     ArrayAdapter<String> adapter;
+    String filename = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +62,6 @@ public class TextListActivity extends Activity {
         listButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                /*
-
                 // This part is to ask the user the type in the file name after creating new doc
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(TextListActivity.this);
                 alertDialog.setTitle("Create New File");
@@ -71,26 +70,52 @@ public class TextListActivity extends Activity {
                 final EditText input = new EditText(TextListActivity.this);
                 alertDialog.setView(input);
 
-                alertDialog.setPositiveButton("YES",
+                alertDialog.setPositiveButton("OKAY",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                String filename = input.getText().toString();
-                                if (filename.compareTo("") == 0) {
-                                    if (pass.equals(password)) {
+                                String filename2 = input.getText().toString();
+                                if (filename2.compareTo("") == 0) {
                                         Toast.makeText(getApplicationContext(),
-                                                "Password Matched", Toast.LENGTH_SHORT).show();
-                                        Intent myIntent1 = new Intent(view.getContext(),
-                                                Show.class);
-                                        startActivityForResult(myIntent1, 0);
+                                                "Invalid File Name", Toast.LENGTH_SHORT).show();
                                     } else {
+                                    filename = filename2;
                                         Toast.makeText(getApplicationContext(),
-                                                "Wrong Password!", Toast.LENGTH_SHORT).show();
+                                                "Good!", Toast.LENGTH_SHORT).show();
+                                    File selectedFile = new File(TextListActivity.this.getFilesDir(), filename);
+                                    if (!selectedFile.exists()) {
+                                        // String content = "Hello world!";
+                                        String content = "";    // empty string
+                                        FileOutputStream outputStream;
+                                        try {
+                                            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                                            outputStream.write(content.getBytes());
+                                            outputStream.close();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                     }
+                                    // Obtain file names from internal storage
+                                    myList = new ArrayList<>();
+                                    //file = new File(Environment.getDataDirectory().toString()); // Return the user data directory
+                                    file = TextListActivity.this.getFilesDir();
+                                    File[] list = file.listFiles();
+                                    try {
+                                        for (File aList : list) {
+                                            if (!CompareChangeActivity.isParentFileName(aList.getName()))
+                                                myList.add(aList.getName());
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    // Display the list
+                                    listView = (ListView) findViewById(R.id.list_view);
+                                    adapter = new ArrayAdapter<String>(TextListActivity.this, android.R.layout.simple_list_item_1, myList);
+                                    listView.setAdapter(adapter);
                                 }
                             }
                         });
 
-                alertDialog.setNegativeButton("NO",
+                alertDialog.setNegativeButton("CANCEL",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
@@ -99,39 +124,9 @@ public class TextListActivity extends Activity {
 
                 alertDialog.show();
 
-                */
-
-                String filename = "new_file";
-                File selectedFile = new File(TextListActivity.this.getFilesDir(), filename);
-                if (!selectedFile.exists()) {
-                    // String content = "Hello world!";
-                    String content = "";    // empty string
-                    FileOutputStream outputStream;
-                    try {
-                        outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-                        outputStream.write(content.getBytes());
-                        outputStream.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                if (filename == null){
+                    return;
                 }
-                // Obtain file names from internal storage
-                myList = new ArrayList<>();
-                //file = new File(Environment.getDataDirectory().toString()); // Return the user data directory
-                file = TextListActivity.this.getFilesDir();
-                File[] list = file.listFiles();
-                try {
-                    for (File aList : list) {
-                        if (!CompareChangeActivity.isParentFileName(aList.getName()))
-                            myList.add(aList.getName());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                // Display the list
-                listView = (ListView) findViewById(R.id.list_view);
-                adapter = new ArrayAdapter<String>(TextListActivity.this, android.R.layout.simple_list_item_1, myList);
-                listView.setAdapter(adapter);
             }
         });
 
@@ -234,9 +229,6 @@ public class TextListActivity extends Activity {
                 // Set result and finish this Activity
                 setResult(Activity.RESULT_OK, intent);
                 finish();
-                return true;
-            case R.id.rename:
-                //editNote(info.id);
                 return true;
             case R.id.delete:
                 //deleteNote(info.id);
