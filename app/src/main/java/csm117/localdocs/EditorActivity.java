@@ -92,6 +92,60 @@ public class EditorActivity extends AppCompatActivity {
 		}
 	}
 
+	private void saveParentFile(String mergedText) {
+		EditText fileNameField = (EditText) this.findViewById(R.id.fileName);
+		String fileName = fileNameField.getText().toString();
+		fileName = CompareChangeActivity.parentFileName(fileName);
+
+		FileOutputStream outputStream = null;
+		try {
+			outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
+			outputStream.write(mergedText.getBytes());
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (outputStream != null) {
+					outputStream.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private String readParentFile() {
+		EditText fileNameField = (EditText) this.findViewById(R.id.fileName);
+		String fileName = fileNameField.getText().toString();
+		fileName = CompareChangeActivity.parentFileName(fileName);
+
+		StringBuilder builder = new StringBuilder();
+
+		BufferedInputStream inputStream = null;
+		try {
+			inputStream = new BufferedInputStream(openFileInput(fileName));
+			byte[] buffer = new byte[1024];
+			int n;
+			String str = "";
+			while ((n = inputStream.read(buffer)) != -1) {
+				builder.append(new String(buffer, 0, n));
+			}
+		} catch (FileNotFoundException e) {
+			// No backup file ever made.  return null.
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (inputStream != null)
+					inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return builder.toString();
+	}
+
 	public void test3Merge(View view) {
 		EditText fileNameField = (EditText) this.findViewById(R.id.fileName);
 		String fileName = fileNameField.getText().toString();
@@ -198,13 +252,14 @@ public class EditorActivity extends AppCompatActivity {
 	}
 
 	private void sendMessage(String message) {
+		boolean connected = false;
 		for (int i = 0; i < mServices.size(); i++) {
 			BluetoothService mChatService = mServices.get(i);
 			// Check that we're actually connected before trying anything
 			if (mChatService.getState() != BluetoothService.STATE_CONNECTED) {
-				Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
-				return;
+				continue;
 			}
+			connected = true;
 
 			// Check that there's actually something to send
 			if (message.length() > 0) {
@@ -212,6 +267,10 @@ public class EditorActivity extends AppCompatActivity {
 				byte[] send = message.getBytes();
 				mChatService.write(send);
 			}
+		}
+		// If not connected to any device, post a message.
+		if (!connected) {
+			Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -335,13 +394,23 @@ public class EditorActivity extends AppCompatActivity {
 						// To simply accept sent text (overwriting this user's changes),
 						// set the textView's text to the sent message.
 						//textView.setText(readMessage.substring(1), EditText.BufferType.EDITABLE);
-						// To do a 2 merge with the sent text, create and send an intent to 2merge
-						// with both versions.
-						Intent merge2Intent = new Intent(activity, CompareChangeActivity.class);
-						merge2Intent.putExtra(CompareChangeActivity.EXTRA_NEW_VERSION, readMessage.substring(1));
-						merge2Intent.putExtra(CompareChangeActivity.EXTRA_PREVIOUS_VERSION, textView.getText().toString());
-						activity.startActivityForResult(merge2Intent, REQUEST_2MERGE);
-
+						// Try to read the parent history file.  If reading is successful,
+						// do a 3 merge.
+						String parent = activity.readParentFile();
+						if (parent != null) {
+							Intent merge3Intent = new Intent(activity, MergeActivity.class);
+							merge3Intent.putExtra(MergeActivity.EXTRA_PARENT_VERSION, parent);
+							merge3Intent.putExtra(MergeActivity.EXTRA_MY_VERSION, textView.getText().toString());
+							merge3Intent.putExtra(MergeActivity.EXTRA_THEIR_VERSION, readMessage.substring(1));
+							activity.startActivityForResult(merge3Intent, REQUEST_3MERGE);
+						} else {
+							// To do a 2 merge with the sent text, create and send an intent to 2merge
+							// with both versions.
+							Intent merge2Intent = new Intent(activity, CompareChangeActivity.class);
+							merge2Intent.putExtra(CompareChangeActivity.EXTRA_NEW_VERSION, readMessage.substring(1));
+							merge2Intent.putExtra(CompareChangeActivity.EXTRA_PREVIOUS_VERSION, textView.getText().toString());
+							activity.startActivityForResult(merge2Intent, REQUEST_2MERGE);
+						}
 						//mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
 					}
 					else if (readMessage.charAt(0) == 'r') {
@@ -439,6 +508,10 @@ public class EditorActivity extends AppCompatActivity {
 					String content = data.getStringExtra(MergeActivity.EXTRA_MERGED);
 					EditText textView = (EditText) findViewById(R.id.editor);
 					textView.setText(content, EditText.BufferType.EDITABLE);
+					saveParentFile(content);
+					if (mBluetoothAdapter != null) {
+						sendMessage ("m" + content);
+					}
 				}
 				break;
 			case REQUEST_2MERGE:
@@ -446,6 +519,7 @@ public class EditorActivity extends AppCompatActivity {
 					String content = data.getStringExtra(CompareChangeActivity.EXTRA_ACCEPTED_CHANGES);
 					EditText textView = (EditText) findViewById(R.id.editor);
 					textView.setText(content, EditText.BufferType.EDITABLE);
+					saveParentFile(content);
 					if (mBluetoothAdapter != null) {
 						sendMessage ("m" + content);
 					}

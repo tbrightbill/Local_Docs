@@ -297,4 +297,8 @@ public class CompareChangeActivity extends AppCompatActivity {
 		}
 		return merged;
 	}
+
+	static String parentFileName(String name) {
+		return name + "~";
+	}
 }
