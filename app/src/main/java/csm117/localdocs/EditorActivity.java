@@ -420,6 +420,7 @@ public class EditorActivity extends AppCompatActivity {
 					}
 					else if (readMessage.charAt(0) == 'm') {
 						EditText textView = (EditText) activity.findViewById(R.id.editor);
+						activity.saveParentFile(readMessage.substring(1));
 						textView.setText(readMessage.substring(1), EditText.BufferType.EDITABLE);
 					}
 					break;

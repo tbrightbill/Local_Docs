@@ -34,6 +34,7 @@ import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.app.AlertDialog;
+import csm117.localdocs.CompareChangeActivity;
 
 public class TextListActivity extends Activity {
 
@@ -121,7 +122,8 @@ public class TextListActivity extends Activity {
                 File[] list = file.listFiles();
                 try {
                     for (File aList : list) {
-                        myList.add(aList.getName());
+                        if (!CompareChangeActivity.isParentFileName(aList.getName()))
+                            myList.add(aList.getName());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -140,7 +142,8 @@ public class TextListActivity extends Activity {
         File[] list = file.listFiles();
         try {
             for (File aList : list) {
-                myList.add(aList.getName());
+                if (!CompareChangeActivity.isParentFileName(aList.getName()))
+                    myList.add(aList.getName());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -239,7 +242,9 @@ public class TextListActivity extends Activity {
                 //deleteNote(info.id);
                 File[] list2 = file.listFiles();
                 File selectedFile2 = list2[info.position];
+                String name = selectedFile2.getName();
                 selectedFile2.delete();
+                deleteFile(CompareChangeActivity.parentFileName(name));
 
                 // Obtain file names from internal storage
                 myList = new ArrayList<>();
@@ -248,7 +253,8 @@ public class TextListActivity extends Activity {
                 File[] list3 = file.listFiles();
                 try {
                     for (File aList : list3) {
-                        myList.add(aList.getName());
+                        if (!CompareChangeActivity.isParentFileName(aList.getName()))
+                            myList.add(aList.getName());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

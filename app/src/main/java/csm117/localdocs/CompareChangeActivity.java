@@ -301,4 +301,5 @@ public class CompareChangeActivity extends AppCompatActivity {
 	static String parentFileName(String name) {
 		return name + "~";
 	}
+	static boolean isParentFileName(String name) { return name.endsWith("~"); }
 }
