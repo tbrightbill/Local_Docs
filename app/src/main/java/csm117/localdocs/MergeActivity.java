@@ -58,14 +58,14 @@ public class MergeActivity extends AppCompatActivity {
 		String[] result = partialMerge(Diff.splitString(parent), myDiff.getChanges(), theirDiff.getChanges());
 		//Diff diff = Diff.createDiff(mine, combined);
 		Diff diff = Diff.createDiff(result[0], result[1]);
-		String base = diff.getColoredHTMLString(mine);
+		String base = diff.getColoredHTMLString(result[0]);
 		ScrollingMovementMethod method = new ScrollingMovementMethod();
 		TextView merged = (TextView) findViewById(R.id.mergeText);
 		merged.setText(Html.fromHtml(base));
 		//merged.setText(Html.fromHtml(combined));
 		merged.setMovementMethod(method);
 		//combinedText = combined;
-		combinedText = "";
+		combinedText = result[1];
 	}
 
 	public void accept(View view) {
@@ -169,7 +169,6 @@ public class MergeActivity extends AppCompatActivity {
 		while (a < otoa.size()) {
 			Edit aedit = otoa.get(a);
 			if (o < aedit.index) {
-				// Finally, combine the last chunks.
 				if (!(chunkA.isEmpty() && chunkB.isEmpty() && chunkOriginal.isEmpty())) {
 					if (chunkOriginal.equals(chunkA)) {
 						// Nonconflicting edit by B:
@@ -191,14 +190,14 @@ public class MergeActivity extends AppCompatActivity {
 					chunkA = "";
 					chunkB = "";
 					chunkOriginal = "";
-					do {
-						chunkOriginal += original.get(o);
-						o++;
-					} while (o < aedit.index);
-					resultA += chunkOriginal;
-					resultB += chunkOriginal;
-					chunkOriginal = "";
 				}
+				do {
+					chunkOriginal += original.get(o);
+					o++;
+				} while (o < aedit.index);
+				resultA += chunkOriginal;
+				resultB += chunkOriginal;
+				chunkOriginal = "";
 			}
 			if (aedit.isInsert) {
 				chunkA += aedit.change;
@@ -235,14 +234,14 @@ public class MergeActivity extends AppCompatActivity {
 					chunkA = "";
 					chunkB = "";
 					chunkOriginal = "";
-					do {
-						chunkOriginal += original.get(o);
-						o++;
-					} while (o < bedit.index);
-					resultA += chunkOriginal;
-					resultB += chunkOriginal;
-					chunkOriginal = "";
 				}
+				do {
+					chunkOriginal += original.get(o);
+					o++;
+				} while (o < bedit.index);
+				resultA += chunkOriginal;
+				resultB += chunkOriginal;
+				chunkOriginal = "";
 			}
 			if (bedit.isInsert) {
 				chunkB += bedit.change;
