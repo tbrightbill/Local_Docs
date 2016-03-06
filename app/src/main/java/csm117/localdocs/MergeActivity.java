@@ -54,21 +54,18 @@ public class MergeActivity extends AppCompatActivity {
 
 		Diff myDiff = Diff.createDiff(parent, mine);
 		Diff theirDiff = Diff.createDiff(parent, theirs);
-		String combined = fullyAutomatedMerge(Diff.splitString(parent), myDiff.getChanges(), theirDiff.getChanges());
-		Diff diff = Diff.createDiff(mine, combined);
+		//String combined = fullyAutomatedMerge(Diff.splitString(parent), myDiff.getChanges(), theirDiff.getChanges());
+		String[] result = partialMerge(Diff.splitString(parent), myDiff.getChanges(), theirDiff.getChanges());
+		//Diff diff = Diff.createDiff(mine, combined);
+		Diff diff = Diff.createDiff(result[0], result[1]);
 		String base = diff.getColoredHTMLString(mine);
 		ScrollingMovementMethod method = new ScrollingMovementMethod();
-		/*TextView myView = (TextView) findViewById(R.id.myText);
-		myView.setText(Html.fromHtml(mine));
-		myView.setMovementMethod(method);
-		TextView theirView = (TextView) findViewById(R.id.theirText);
-		theirView.setText(Html.fromHtml(theirs));
-		theirView.setMovementMethod(method);*/
 		TextView merged = (TextView) findViewById(R.id.mergeText);
 		merged.setText(Html.fromHtml(base));
 		//merged.setText(Html.fromHtml(combined));
 		merged.setMovementMethod(method);
-		combinedText = combined;
+		//combinedText = combined;
+		combinedText = "";
 	}
 
 	public void accept(View view) {
@@ -76,6 +73,215 @@ public class MergeActivity extends AppCompatActivity {
 		intent.putExtra(EXTRA_MERGED, combinedText);
 		setResult (Activity.RESULT_OK, intent);
 		finish();
+	}
+
+	public static String[] partialMerge(ArrayList<String> original, ArrayList<Edit> otoa, ArrayList<Edit> otob) {
+		int a = 0; // Index into otoa
+		int b = 0; // Index into otob
+		int o = 0; // Index into original string.
+		String resultA = "";
+		String resultB = "";
+		String chunkOriginal = "";
+		String chunkA = "";
+		String chunkB = "";
+		while (a < otoa.size() && b < otob.size()) {
+			Edit aedit = otoa.get(a);
+			Edit bedit = otob.get(b);
+			if (o < aedit.index && o < bedit.index) {
+				// Handle previous unstable chunk
+				if (!(chunkOriginal.isEmpty() && chunkA.isEmpty() && chunkB.isEmpty())) {
+					if (chunkOriginal.equals(chunkA)) {
+						// Nonconflicting edit by B:
+						// Propagate edit to both versions
+						resultA += chunkB;
+						resultB += chunkB;
+					} else if (chunkOriginal.equals(chunkB)) {
+						// Nonconflicting edit by A
+						// Propagate edit to both versions
+						resultA += chunkA;
+						resultB += chunkA;
+					} else {
+						// Conflicting edit.
+						// May be falsely conflicting, but will be detected
+						// by CompareChangeActivity.
+						resultA += chunkA;
+						resultB += chunkB;
+					}
+				}
+				chunkA = "";
+				chunkB = "";
+				chunkOriginal = "";
+				do {
+					chunkOriginal += original.get(o);
+					o++;
+				} while (o < aedit.index && o < bedit.index);
+				resultA += chunkOriginal;
+				resultB += chunkOriginal;
+				chunkOriginal = "";
+			}
+
+			if (o == aedit.index && o == bedit.index) {
+				if (!aedit.isInsert && !bedit.isInsert) {
+					// If both are now deletions, handle the delete.
+					chunkOriginal += original.get(o);
+					o++;
+					a++;
+					b++;
+				} else {
+					if (aedit.isInsert) {
+						chunkA += aedit.change;
+						a++;
+					}
+					if (bedit.isInsert) {
+						chunkB += bedit.change;
+						b++;
+					}
+					// Don't handle a deletion of a word until
+					// both a and b are done with insertions.
+				}
+			} else if (o == aedit.index) {
+				if (aedit.isInsert) {
+					chunkA += aedit.change;
+					a++;
+				} else {
+					chunkOriginal += original.get(o);
+					chunkB += original.get(o);
+					o++;
+					a++;
+				}
+			} else if (o == bedit.index) {
+				if (bedit.isInsert) {
+					chunkB += bedit.change;
+					b++;
+				} else {
+					chunkOriginal += original.get(o);
+					chunkA += original.get(o);
+					o++;
+					b++;
+				}
+			}
+		}
+		// We have finished all edits in one of the versions.
+		// If we are currently in a conflicting chunk,
+		// the remaining chunk should be conflicting.
+		// Otherwise, this entire chunk is non-conflicting.
+
+		while (a < otoa.size()) {
+			Edit aedit = otoa.get(a);
+			if (o < aedit.index) {
+				// Finally, combine the last chunks.
+				if (!(chunkA.isEmpty() && chunkB.isEmpty() && chunkOriginal.isEmpty())) {
+					if (chunkOriginal.equals(chunkA)) {
+						// Nonconflicting edit by B:
+						// Propagate edit to both versions
+						resultA += chunkB;
+						resultB += chunkB;
+					} else if (chunkOriginal.equals(chunkB)) {
+						// Nonconflicting edit by A
+						// Propagate edit to both versions
+						resultA += chunkA;
+						resultB += chunkA;
+					} else {
+						// Conflicting edit.
+						// May be falsely conflicting, but will be detected
+						// by CompareChangeActivity.
+						resultA += chunkA;
+						resultB += chunkB;
+					}
+					chunkA = "";
+					chunkB = "";
+					chunkOriginal = "";
+					do {
+						chunkOriginal += original.get(o);
+						o++;
+					} while (o < aedit.index);
+					resultA += chunkOriginal;
+					resultB += chunkOriginal;
+					chunkOriginal = "";
+				}
+			}
+			if (aedit.isInsert) {
+				chunkA += aedit.change;
+				a++;
+			} else {
+				chunkB += original.get(o);
+				chunkOriginal += original.get(o);
+				o++;
+				a++;
+			}
+		}
+		while (b < otob.size()) {
+			Edit bedit = otob.get(b);
+			if (o < bedit.index) {
+				// Finally, combine the last chunks.
+				if (!(chunkA.isEmpty() && chunkB.isEmpty() && chunkOriginal.isEmpty())) {
+					if (chunkOriginal.equals(chunkA)) {
+						// Nonconflicting edit by B:
+						// Propagate edit to both versions
+						resultA += chunkB;
+						resultB += chunkB;
+					} else if (chunkOriginal.equals(chunkB)) {
+						// Nonconflicting edit by A
+						// Propagate edit to both versions
+						resultA += chunkA;
+						resultB += chunkA;
+					} else {
+						// Conflicting edit.
+						// May be falsely conflicting, but will be detected
+						// by CompareChangeActivity.
+						resultA += chunkA;
+						resultB += chunkB;
+					}
+					chunkA = "";
+					chunkB = "";
+					chunkOriginal = "";
+					do {
+						chunkOriginal += original.get(o);
+						o++;
+					} while (o < bedit.index);
+					resultA += chunkOriginal;
+					resultB += chunkOriginal;
+					chunkOriginal = "";
+				}
+			}
+			if (bedit.isInsert) {
+				chunkB += bedit.change;
+				b++;
+			} else {
+				chunkA += original.get(o);
+				chunkOriginal += original.get(o);
+				o++;
+				b++;
+			}
+		}
+		if (chunkOriginal.equals(chunkA)) {
+			// Nonconflicting edit by B:
+			// Propagate edit to both versions
+			resultA += chunkB;
+			resultB += chunkB;
+		} else if (chunkOriginal.equals(chunkB)) {
+			// Nonconflicting edit by A
+			// Propagate edit to both versions
+			resultA += chunkA;
+			resultB += chunkA;
+		} else {
+			// Conflicting edit.
+			// May be falsely conflicting, but will be detected
+			// by CompareChangeActivity.
+			resultA += chunkA;
+			resultB += chunkB;
+		}
+		//chunkA = "";
+		//chunkB = "";
+		chunkOriginal = "";
+		while (o < original.size()) {
+			chunkOriginal += original.get(o);
+			o++;
+		}
+		resultA += chunkOriginal;
+		resultB += chunkOriginal;
+
+		return new String[] {resultA, resultB};
 	}
 
 	public static String fullyAutomatedMerge(ArrayList<String> original, ArrayList<Edit> otoa, ArrayList<Edit> otob) {
@@ -105,7 +311,7 @@ public class MergeActivity extends AppCompatActivity {
 					b++;
 					continue;
 				}
-				// Either one is an instert, and one is a delete,
+				// Either one is an insert, and one is a delete,
 				// Or both are inserts of different words.
 				// Assume that A acted first
 			}

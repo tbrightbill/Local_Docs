@@ -29,6 +29,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import csm117.diff.Diff;
+
 public class EditorActivity extends AppCompatActivity {
 
 	private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
@@ -149,10 +151,12 @@ public class EditorActivity extends AppCompatActivity {
 	public void test3Merge(View view) {
 		EditText fileNameField = (EditText) this.findViewById(R.id.fileName);
 		String fileName = fileNameField.getText().toString();
+		String parentName = CompareChangeActivity.parentFileName(fileName);
 
 		EditText textView = (EditText) this.findViewById(R.id.editor);
 		String content = textView.getText().toString();
 		StringBuilder builder = new StringBuilder();
+		StringBuilder parentBuilder = new StringBuilder();
 
 		BufferedInputStream inputStream = null;
 		try {
@@ -162,6 +166,12 @@ public class EditorActivity extends AppCompatActivity {
 			String str = "";
 			while ((n = inputStream.read(buffer)) != -1) {
 				builder.append(new String(buffer, 0, n));
+			}
+			inputStream.close();
+			inputStream = null;
+			inputStream = new BufferedInputStream(openFileInput(parentName));
+			while ((n = inputStream.read(buffer)) != -1) {
+				parentBuilder.append(new String(buffer, 0, n));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -176,8 +186,8 @@ public class EditorActivity extends AppCompatActivity {
 
 		Intent intent = new Intent(this, MergeActivity.class);
 		intent.putExtra(MergeActivity.EXTRA_MY_VERSION, content);
-		intent.putExtra(MergeActivity.EXTRA_PARENT_VERSION, builder.toString());
-		intent.putExtra(MergeActivity.EXTRA_THEIR_VERSION, "Fun fun funn fun");
+		intent.putExtra(MergeActivity.EXTRA_PARENT_VERSION, parentBuilder.toString());
+		intent.putExtra(MergeActivity.EXTRA_THEIR_VERSION, builder.toString());
 		startActivityForResult(intent, REQUEST_3MERGE);
 	}
 	public void test2Merge(View view) {
@@ -398,11 +408,23 @@ public class EditorActivity extends AppCompatActivity {
 						// do a 3 merge.
 						String parent = activity.readParentFile();
 						if (parent != null) {
-							Intent merge3Intent = new Intent(activity, MergeActivity.class);
+							/*Intent merge3Intent = new Intent(activity, MergeActivity.class);
 							merge3Intent.putExtra(MergeActivity.EXTRA_PARENT_VERSION, parent);
 							merge3Intent.putExtra(MergeActivity.EXTRA_MY_VERSION, textView.getText().toString());
 							merge3Intent.putExtra(MergeActivity.EXTRA_THEIR_VERSION, readMessage.substring(1));
-							activity.startActivityForResult(merge3Intent, REQUEST_3MERGE);
+							activity.startActivityForResult(merge3Intent, REQUEST_3MERGE);*/
+
+							Diff otoa = Diff.createDiff(parent, textView.getText().toString());
+							Diff otob = Diff.createDiff(parent, readMessage.substring(1));
+							String s = MergeActivity.fullyAutomatedMerge(Diff.splitString(parent),
+									otoa.getChanges(), otob.getChanges());
+							String[] result = MergeActivity.partialMerge(Diff.splitString(parent),
+									otoa.getChanges(), otob.getChanges());
+
+							Intent merge2Intent = new Intent(activity, CompareChangeActivity.class);
+							merge2Intent.putExtra(CompareChangeActivity.EXTRA_NEW_VERSION, result[0]);
+							merge2Intent.putExtra(CompareChangeActivity.EXTRA_PREVIOUS_VERSION, result[1]);
+							activity.startActivityForResult(merge2Intent, REQUEST_2MERGE);
 						} else {
 							// To do a 2 merge with the sent text, create and send an intent to 2merge
 							// with both versions.
