@@ -32,7 +32,7 @@
 		android:layout_gravity="bottom|end"
 		android:layout_margin="@dimen/fab_margin"
 		android:onClick="sendDocumentButton"
-		android:src="@android:drawable/ic_dialog_email" />
+		android:src="@drawable/ic_menu_forward" />
 
 	<android.support.design.widget.FloatingActionButton
 		android:id="@+id/fabRetrieve"
@@ -41,7 +41,7 @@
 		android:layout_gravity="bottom|start"
 		android:layout_margin="@dimen/fab_margin"
 		android:onClick="retrieveDocumentButton"
-		android:src="@android:drawable/ic_dialog_email" />
+		android:src="@drawable/ic_menu_back" />
 
 
 

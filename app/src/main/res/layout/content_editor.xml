@@ -14,6 +14,18 @@
 	tools:showIn="@layout/activity_editor"
 	android:weightSum="1">
 
+	<EditText android:id="@+id/editor"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_above="@+id/btnSave"
+		android:layout_alignParentTop="true"
+		android:allowUndo="true"
+		android:editable="true"
+		android:elegantTextHeight="true"
+		android:focusable="true"
+		android:enabled="true"
+		android:nestedScrollingEnabled="true"
+		android:gravity="top"/>
 	<Button
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -26,17 +38,7 @@
 		android:layout_alignRight="@+id/editor"
 		android:layout_alignEnd="@+id/editor" />
 
-	<EditText android:id="@+id/editor"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_above="@+id/btnSave"
-		android:layout_alignParentTop="true"
-		android:allowUndo="true"
-		android:editable="true"
-		android:elegantTextHeight="true"
-		android:focusable="true"
-		android:enabled="true"
-		android:nestedScrollingEnabled="true" />
+
 
 	<Button
 		android:id="@+id/fileList"
