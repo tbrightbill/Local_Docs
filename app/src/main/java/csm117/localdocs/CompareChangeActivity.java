@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.RelativeLayout.LayoutParams;
@@ -118,8 +119,8 @@ public class CompareChangeActivity extends AppCompatActivity {
 					);
 					subLayout.setOrientation(LinearLayout.HORIZONTAL);*/
 					ArrayList<View> line = new ArrayList<>();
-					Button accept = new Button(this);
-					Button reject = new Button(this);
+					ImageButton accept = new ImageButton(this);
+					ImageButton reject = new ImageButton(this);
 					TextView changedText = new TextView(this);
 					accept.setId(id);
 					changedText.setId(id + 1);
@@ -127,13 +128,13 @@ public class CompareChangeActivity extends AppCompatActivity {
 					line.add(accept);
 					line.add(changedText);
 					line.add(reject);
-					accept.setBackgroundResource(android.R.drawable.ic_input_add);
+					accept.setImageResource(android.R.drawable.ic_input_add);
 					//accept.setText("+");
 					accept.setOnClickListener(
 							new DecisionListener(Choice.ACCEPT, editStart, i, line));
 
 					LayoutParams relative = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-					if (id > 1) {
+					/*if (id > 1) {
 						//relative.addRule(RelativeLayout.RIGHT_OF, id-1);
 						relative.addRule(RelativeLayout.BELOW, previousRowId);
 						//relative.addRule(RelativeLayout.RIGHT_OF, id-1)
@@ -143,9 +144,13 @@ public class CompareChangeActivity extends AppCompatActivity {
 						relative.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 						//relative.addRule(RelativeLayout.ALIGN_PARENT_START);
 						relative.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-					}
+					}*/
+					relative.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+					//relative.addRule(RelativeLayout.LEFT_OF, id+1);
+					relative.addRule(RelativeLayout.ALIGN_TOP, id+1);
+					relative.addRule(RelativeLayout.ALIGN_BOTTOM, id+1);
+					//relative.addRule(RelativeLayout.ALIGN_BASELINE, id+1);
 					accept.setLayoutParams(relative);
-					layout.addView(accept);
 
 					changedText.setText(altered);
 					if (inserting)
@@ -154,29 +159,33 @@ public class CompareChangeActivity extends AppCompatActivity {
 						changedText.setBackgroundResource(R.color.colorBlue);
 					relative = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 					relative.addRule(RelativeLayout.RIGHT_OF, id);
-					relative.addRule(RelativeLayout.LEFT_OF, id+2);
+					//relative.addRule(RelativeLayout.LEFT_OF, id+2);
 					//relative.addRule(RelativeLayout.BELOW, id);
 					//relative.addRule(RelativeLayout.END_OF, id);
 					if (id > 1)
 						relative.addRule(RelativeLayout.BELOW, previousRowId);
-					relative.addRule(RelativeLayout.ALIGN_BASELINE, id);
-					//changedText.setLayoutParams(relative);
-					layout.addView(changedText, relative);
+					//relative.addRule(RelativeLayout.ALIGN_BASELINE, id);
+					changedText.setLayoutParams(relative);
 
-					reject.setBackgroundResource(android.R.drawable.ic_delete);
+					reject.setImageResource(android.R.drawable.ic_delete);
 					//reject.setText("X");
 					reject.setOnClickListener(
 							new DecisionListener(Choice.REJECT, editStart, i, line));
 					relative = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-					//relative.addRule(RelativeLayout.RIGHT_OF, id+1);
+					relative.addRule(RelativeLayout.RIGHT_OF, id+1);
 					//relative.addRule(RelativeLayout.BELOW, id+1);
 					//relative.addRule(RelativeLayout.END_OF, id+1);
 					relative.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-					if (id > 1)
-						relative.addRule(RelativeLayout.BELOW, previousRowId);
-					relative.addRule(RelativeLayout.ALIGN_BASELINE, id+1);
-					//reject.setLayoutParams(relative);
-					layout.addView(reject, relative);
+					//if (id > 1)
+					//	relative.addRule(RelativeLayout.BELOW, previousRowId);
+					relative.addRule(RelativeLayout.ALIGN_TOP, id+1);
+					relative.addRule(RelativeLayout.ALIGN_BOTTOM, id+1);
+					//relative.addRule(RelativeLayout.ALIGN_BASELINE, id+1);
+					reject.setLayoutParams(relative);
+					layout.addView(changedText);
+					layout.addView(reject);
+					layout.addView(accept);
+
 
 					altered = "";
 					editStart = i;
