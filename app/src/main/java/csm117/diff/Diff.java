@@ -237,11 +237,11 @@ public final class Diff {
 			k++;
 			// newlines are not respected by html, so encode them:
 			// Assumes that \n is a dividing character.
-			if (result.charAt(result.length() - 1) == '\n') {
+			/*if (result.charAt(result.length() - 1) == '\n') {
 				result += "</p>\n<p>";
-			}
+			}*/
 		}
-		result += "</p>";
+		//result += "</p>";
 		return result;
 	}
 

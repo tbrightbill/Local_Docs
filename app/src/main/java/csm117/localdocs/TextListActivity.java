@@ -191,7 +191,19 @@ public class TextListActivity extends Activity {
         if (v.getId()==R.id.list_view) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
             File[] list = file.listFiles();
-            menu.setHeaderTitle(list[info.position].getName());
+            int actualIndex;
+            // info.position gives an index into the displayed list.
+            // However, we have hidden files, so this is not the actual index of the file.
+            // This loop finds the actual index.
+            int i = 0;
+            for (actualIndex = 0; actualIndex < list.length - 1; actualIndex++) {
+                if (!CompareChangeActivity.isParentFileName(list[actualIndex].getName())) {
+                    if (i == info.position)
+                        break;
+                    i++;
+                }
+            }
+            menu.setHeaderTitle(list[actualIndex].getName());
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.menu_file_context, menu);
         }
@@ -203,7 +215,19 @@ public class TextListActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.open:
                 File[] list = file.listFiles();
-                File selectedFile = list[info.position];
+                int actualIndex;
+                // info.position gives an index into the displayed list.
+                // However, we have hidden files, so this is not the actual index of the file.
+                // This loop finds the actual index.
+                int i = 0;
+                for (actualIndex = 0; actualIndex < list.length - 1; actualIndex++) {
+                    if (!CompareChangeActivity.isParentFileName(list[actualIndex].getName())) {
+                        if (i == info.position)
+                            break;
+                        i++;
+                    }
+                }
+                File selectedFile = list[actualIndex];
                 //Read text from file
                 StringBuilder text = new StringBuilder();
 
@@ -233,7 +257,15 @@ public class TextListActivity extends Activity {
             case R.id.delete:
                 //deleteNote(info.id);
                 File[] list2 = file.listFiles();
-                File selectedFile2 = list2[info.position];
+                int i2 = 0;
+                for (actualIndex = 0; actualIndex < list2.length - 1; actualIndex++) {
+                    if (!CompareChangeActivity.isParentFileName(list2[actualIndex].getName())) {
+                        if (i2 == info.position)
+                            break;
+                        i2++;
+                    }
+                }
+                File selectedFile2 = list2[actualIndex];
                 String name = selectedFile2.getName();
                 selectedFile2.delete();
                 deleteFile(CompareChangeActivity.parentFileName(name));
