@@ -58,7 +58,8 @@
 		android:id="@+id/fileName"
 		android:layout_centerHorizontal="true"
 		android:hint="File Name"
-		android:layout_below="@+id/fileList" />
+		android:layout_below="@+id/fileList"
+		android:gravity="center"/>
 
 	<!-- Uncomment the following to test the merge page -->
 	<!-- <Button
